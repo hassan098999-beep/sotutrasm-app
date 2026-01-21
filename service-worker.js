@@ -3,6 +3,7 @@ const CACHE_NAME = 'sotutrasm-v1.0.0';
 const urlsToCache = [
   './',
   './index.html',
+  './manifest.json',
   // Vous pouvez ajouter d'autres ressources statiques ici
 ];
 
@@ -88,7 +89,7 @@ self.addEventListener('sync', event => {
 
 // Notification push
 self.addEventListener('push', event => {
-  const data = event.data.json();
+  const data = event.data ? event.data.json() : {};
   const options = {
     body: data.body || 'Nouvelle notification',
     icon: 'icon-192x192.png',
@@ -120,18 +121,30 @@ async function syncData() {
     const pendingData = await getPendingData();
     
     // Synchroniser avec le serveur
-    const response = await fetch('https://api.example.com/sync', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(pendingData)
-    });
+    if (pendingData.length > 0) {
+      const response = await fetch('https://api.example.com/sync', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(pendingData)
+      });
 
-    if (response.ok) {
-      // Supprimer les données synchronisées
-      await clearPendingData();
-      console.log('Synchronisation réussie');
+      if (response.ok) {
+        // Supprimer les données synchronisées
+        await clearPendingData();
+        console.log('Synchronisation réussie');
+        
+        // Notifier les clients
+        self.clients.matchAll().then(clients => {
+          clients.forEach(client => {
+            client.postMessage({
+              type: 'SYNC_COMPLETE',
+              data: pendingData.length
+            });
+          });
+        });
+      }
     }
   } catch (error) {
     console.error('Erreur de synchronisation:', error);
@@ -140,13 +153,26 @@ async function syncData() {
 
 // Stockage local pour les données en attente
 async function getPendingData() {
-  const data = await caches.open(CACHE_NAME)
-    .then(cache => cache.match('pending-data'))
-    .then(response => response ? response.json() : []);
-  return data;
+  const cache = await caches.open('pending-data');
+  const response = await cache.match('data');
+  return response ? response.json() : [];
 }
 
 async function clearPendingData() {
-  const cache = await caches.open(CACHE_NAME);
-  return cache.delete('pending-data');
+  const cache = await caches.open('pending-data');
+  return cache.delete('data');
+}
+
+// Écouter les messages du client
+self.addEventListener('message', event => {
+  if (event.data.type === 'SAVE_PENDING_DATA') {
+    savePendingDataToCache(event.data.data);
+  }
+});
+
+async function savePendingDataToCache(data) {
+  const cache = await caches.open('pending-data');
+  const currentData = await getPendingData();
+  currentData.push(data);
+  await cache.put('data', new Response(JSON.stringify(currentData)));
 }
