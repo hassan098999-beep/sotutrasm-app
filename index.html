@@ -1,198 +1,1338 @@
 <!DOCTYPE html>
-<html lang="fr" dir="ltr">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SOTUTRASM - Gestion de Dredging</title>
+    <title>SOTUTRASM - Suivi Dredging</title>
     
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #F8FAFC; color: #1E293B; }
-        .card { background: white; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03); border: 1px solid #E2E8F0; }
-        .tab-active { color: #2563EB; border-bottom: 3px solid #2563EB; font-weight: 700; }
-        .input-smart { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #CBD5E1; background: #FFFFFF; outline: none; }
-        .input-smart:focus { border-color: #2563EB; ring: 2px ring-blue-100; }
+        :root {
+            --primary: #2563eb;
+            --primary-light: #3b82f6;
+            --secondary: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --light: #ffffff;
+            --light-gray: #f8fafc;
+            --gray: #94a3b8;
+            --dark-gray: #64748b;
+            --text: #1e293b;
+            --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --border-radius: 16px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--light-gray);
+            color: var(--text);
+            line-height: 1.5;
+            max-width: 100%;
+            overflow-x: hidden;
+            padding-bottom: 80px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 16px;
+        }
+        
+        /* Header */
+        .header {
+            background-color: var(--light);
+            padding: 16px;
+            box-shadow: var(--card-shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .logo-text {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        /* Navigation */
+        .nav-tabs {
+            display: flex;
+            background-color: var(--light);
+            border-bottom: 1px solid #e2e8f0;
+            position: sticky;
+            top: 72px;
+            z-index: 99;
+        }
+        
+        .nav-tab {
+            flex: 1;
+            padding: 16px;
+            text-align: center;
+            font-weight: 500;
+            color: var(--dark-gray);
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .nav-tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+        
+        .nav-tab i {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 20px;
+        }
+        
+        /* Screens */
+        .screen {
+            display: none;
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        .screen.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Cards */
+        .card {
+            background-color: var(--light);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: var(--card-shadow);
+        }
+        
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        /* Buttons */
+        .btn {
+            padding: 14px 24px;
+            border-radius: 12px;
+            font-weight: 500;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-light);
+        }
+        
+        .btn-success {
+            background-color: var(--secondary);
+            color: white;
+        }
+        
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+        
+        .btn-warning {
+            background-color: var(--warning);
+            color: white;
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+        
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 16px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text);
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 16px;
+            font-family: 'Inter', sans-serif;
+            transition: border-color 0.3s;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .select-input {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 16px;
+            font-family: 'Inter', sans-serif;
+            background-color: white;
+            cursor: pointer;
+        }
+        
+        /* Timer */
+        .timer-container {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            border-radius: var(--border-radius);
+            padding: 24px;
+            color: white;
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        
+        .timer-display {
+            font-size: 48px;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+            margin-bottom: 16px;
+        }
+        
+        .timer-controls {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+        
+        /* Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            margin-top: 20px;
+        }
+        
+        .stat-card {
+            background-color: var(--light);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 4px;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: var(--dark-gray);
+        }
+        
+        /* Motor Section */
+        .motor-section {
+            margin-bottom: 24px;
+        }
+        
+        .motor-card {
+            border-left: 4px solid var(--primary);
+            margin-bottom: 12px;
+        }
+        
+        .motor-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .motor-name {
+            font-weight: 600;
+            font-size: 16px;
+        }
+        
+        .motor-hours {
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 18px;
+        }
+        
+        /* Fuel Section */
+        .fuel-level {
+            height: 40px;
+            background-color: #e2e8f0;
+            border-radius: 20px;
+            margin: 20px 0;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .fuel-fill {
+            height: 100%;
+            background: linear-gradient(to right, var(--secondary), #34d399);
+            border-radius: 20px;
+            width: 65%;
+            transition: width 0.5s;
+        }
+        
+        .fuel-percentage {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-weight: 700;
+            color: var(--text);
+            font-size: 18px;
+        }
+        
+        /* Reports */
+        .report-item {
+            border-left: 4px solid var(--secondary);
+            margin-bottom: 12px;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .report-info h4 {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .report-date {
+            color: var(--dark-gray);
+            font-size: 14px;
+        }
+        
+        /* Dredge Selection */
+        .dredge-selection {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+            max-width: 400px;
+            margin: 40px auto;
+        }
+        
+        .dredge-card {
+            background-color: var(--light);
+            border-radius: var(--border-radius);
+            padding: 32px 24px;
+            text-align: center;
+            box-shadow: var(--card-shadow);
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 3px solid transparent;
+        }
+        
+        .dredge-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        }
+        
+        .dredge-card.selected {
+            border-color: var(--primary);
+        }
+        
+        .dredge-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            color: white;
+            font-size: 32px;
+        }
+        
+        .dredge-name {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        
+        .dredge-info {
+            color: var(--dark-gray);
+            font-size: 14px;
+        }
+        
+        /* Utility Classes */
+        .text-center { text-align: center; }
+        .mt-1 { margin-top: 4px; }
+        .mt-2 { margin-top: 8px; }
+        .mt-3 { margin-top: 12px; }
+        .mt-4 { margin-top: 16px; }
+        .mt-5 { margin-top: 24px; }
+        .mb-1 { margin-bottom: 4px; }
+        .mb-2 { margin-bottom: 8px; }
+        .mb-3 { margin-bottom: 12px; }
+        .mb-4 { margin-bottom: 16px; }
+        .mb-5 { margin-bottom: 24px; }
+        
+        /* Responsive */
+        @media (max-width: 600px) {
+            .container {
+                padding: 0 12px;
+            }
+            
+            .timer-display {
+                font-size: 36px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .nav-tab span {
+                font-size: 12px;
+            }
+        }
+        
+        /* Loading */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e2e8f0;
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: var(--secondary);
+            color: white;
+            padding: 16px 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            transform: translateX(120%);
+            transition: transform 0.3s;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
     </style>
 </head>
-<body class="pb-24">
-
-    <div id="view-selection" class="min-h-screen flex flex-col items-center justify-center p-6 bg-white">
-        <div class="text-center mb-10">
-            <h1 class="text-3xl font-extrabold text-blue-600 tracking-tight">SOTUTRASM</h1>
-            <p class="text-slate-500 font-medium">Sélectionnez votre unité de travail</p>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content container">
+            <div class="logo">
+                <div class="logo-icon">S</div>
+                <div class="logo-text">SOTUTRASM</div>
+            </div>
+            <div id="currentDredge" class="dredge-info">
+                <!-- Dynamically filled -->
+            </div>
         </div>
-        <div class="grid grid-cols-1 gap-6 w-full max-w-sm">
-            <button onclick="selectDrague('Blue Shark')" class="card p-8 hover:border-blue-500 transition-all text-center group">
-                <i class="fas fa-ship text-4xl text-blue-600 mb-4 group-hover:scale-110 transition"></i>
-                <h2 class="text-xl font-bold text-slate-800">Blue Shark</h2>
-            </button>
-            <button onclick="selectDrague('White Shark')" class="card p-8 hover:border-blue-500 transition-all text-center group">
-                <i class="fas fa-anchor text-4xl text-slate-400 mb-4 group-hover:scale-110 transition"></i>
-                <h2 class="text-xl font-bold text-slate-800">White Shark</h2>
-            </button>
-        </div>
-    </div>
+    </header>
 
-    <div id="main-app" class="hidden">
-        <nav class="bg-white border-b border-slate-200 sticky top-0 z-50 p-4">
-            <div class="flex justify-between items-center max-w-lg mx-auto">
-                <div>
-                    <span id="display-drague" class="text-xs font-bold text-blue-600 uppercase tracking-widest">DRAGUE</span>
-                    <h1 class="font-extrabold text-lg">SOTUTRASM</h1>
+    <!-- Navigation Tabs -->
+    <nav class="nav-tabs">
+        <div class="nav-tab active" onclick="showTab('operations')">
+            <i class="fas fa-tasks"></i>
+            <span>Opérations</span>
+        </div>
+        <div class="nav-tab" onclick="showTab('motors')">
+            <i class="fas fa-cogs"></i>
+            <span>Moteurs</span>
+        </div>
+        <div class="nav-tab" onclick="showTab('fuel')">
+            <i class="fas fa-gas-pump"></i>
+            <span>Carburant</span>
+        </div>
+        <div class="nav-tab" onclick="showTab('reports')">
+            <i class="fas fa-chart-bar"></i>
+            <span>Rapports</span>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container">
+        <!-- Dredge Selection Screen -->
+        <div id="dredgeSelection" class="screen active">
+            <div class="text-center mt-5">
+                <h1 style="font-size: 28px; margin-bottom: 12px; color: var(--primary);">Sélectionnez votre drague</h1>
+                <p style="color: var(--dark-gray); margin-bottom: 40px;">Choisissez la drague pour laquelle vous allez travailler aujourd'hui</p>
+            </div>
+            
+            <div class="dredge-selection">
+                <div class="dredge-card" onclick="selectDredge('blue-shark')">
+                    <div class="dredge-icon">
+                        <i class="fas fa-ship"></i>
+                    </div>
+                    <div class="dredge-name">Blue Shark</div>
+                    <div class="dredge-info">3 moteurs • CAT C32, CAT 3406, IVECO</div>
                 </div>
-                <div id="timer-display" class="bg-blue-50 text-blue-700 px-4 py-1.5 rounded-full font-mono font-bold border border-blue-100">
-                    00:00:00
+                
+                <div class="dredge-card" onclick="selectDredge('white-shark')">
+                    <div class="dredge-icon">
+                        <i class="fas fa-ship"></i>
+                    </div>
+                    <div class="dredge-name">White Shark</div>
+                    <div class="dredge-info">1 moteur • CAT 3512</div>
                 </div>
             </div>
-            <div class="flex justify-between mt-4 max-w-lg mx-auto overflow-x-auto text-sm font-semibold text-slate-500">
-                <button onclick="showTab('ops')" id="tab-ops" class="px-3 pb-2 tab-active">Opérations</button>
-                <button onclick="showTab('engines')" id="tab-engines" class="px-3 pb-2">Moteurs</button>
-                <button onclick="showTab('fuel')" id="tab-fuel" class="px-3 pb-2">Carburant</button>
-                <button onclick="showTab('reports')" id="tab-reports" class="px-3 pb-2">Rapports</button>
+        </div>
+
+        <!-- Operations Screen -->
+        <div id="operationsScreen" class="screen">
+            <!-- Timer Section -->
+            <div class="timer-container">
+                <div class="timer-display" id="timerDisplay">00:00:00</div>
+                <div class="timer-controls">
+                    <button class="btn btn-success" onclick="startTimer()" id="startBtn">
+                        <i class="fas fa-play"></i> Démarrer
+                    </button>
+                    <button class="btn btn-warning" onclick="pauseTimer()" id="pauseBtn" style="display: none;">
+                        <i class="fas fa-pause"></i> Pause
+                    </button>
+                    <button class="btn btn-danger" onclick="stopTimer()">
+                        <i class="fas fa-stop"></i> Arrêter
+                    </button>
+                </div>
             </div>
-        </nav>
 
-        <main class="p-4 max-w-lg mx-auto">
-            <section id="view-ops" class="tab-content space-y-6">
-                <div class="flex gap-2">
-                    <button onclick="startTimer()" id="btn-start" class="flex-1 bg-green-600 text-white p-4 rounded-2xl font-bold shadow-lg shadow-green-100 hover:bg-green-700"><i class="fas fa-play mr-2"></i>Start</button>
-                    <button onclick="stopTimer()" class="flex-1 bg-red-600 text-white p-4 rounded-2xl font-bold shadow-lg shadow-red-100 hover:bg-red-700"><i class="fas fa-stop mr-2"></i>Stop</button>
+            <!-- Driver Info -->
+            <div class="card">
+                <h3 class="card-title">
+                    <i class="fas fa-user"></i>
+                    Informations de l'équipe
+                </h3>
+                
+                <div class="form-group">
+                    <label class="form-label">Nom du chauffeur</label>
+                    <input type="text" class="form-input" id="driverName" placeholder="Entrez votre nom" value="Jean Dupont">
                 </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Équipe accompagnante</label>
+                    <input type="text" class="form-input" id="teamMembers" placeholder="Noms des membres de l'équipe">
+                </div>
+            </div>
 
-                <div class="card p-5 space-y-4">
-                    <h3 class="font-bold border-b pb-2 text-slate-700">Données du Chantier</h3>
-                    <input type="text" id="chauffeur" class="input-smart" placeholder="Nom du chauffeur">
-                    <div class="grid grid-cols-3 gap-2">
-                        <input type="number" id="long" class="input-smart text-center" placeholder="L">
-                        <input type="number" id="larg" class="input-smart text-center" placeholder="l">
-                        <input type="number" id="prof" class="input-smart text-center" placeholder="P">
+            <!-- Operation Details -->
+            <div class="card">
+                <h3 class="card-title">
+                    <i class="fas fa-ruler-combined"></i>
+                    Dimensions de travail
+                </h3>
+                
+                <div class="form-group">
+                    <label class="form-label">Longueur (mètres)</label>
+                    <input type="number" class="form-input" id="length" placeholder="0.00" step="0.1" min="0">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Largeur (mètres)</label>
+                    <input type="number" class="form-input" id="width" placeholder="0.00" step="0.1" min="0">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Profondeur (mètres)</label>
+                    <input type="number" class="form-input" id="depth" placeholder="0.00" step="0.1" min="0">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Carburant consommé (litres)</label>
+                    <input type="number" class="form-input" id="fuelConsumed" placeholder="0" min="0">
+                </div>
+                
+                <button class="btn btn-primary mt-4" onclick="saveOperation()">
+                    <i class="fas fa-save"></i> Enregistrer l'opération
+                </button>
+            </div>
+
+            <!-- Dashboard -->
+            <div class="card">
+                <h3 class="card-title">
+                    <i class="fas fa-chart-line"></i>
+                    Dashboard
+                </h3>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalHours">00:00</div>
+                        <div class="stat-label">Heures travaillées</div>
                     </div>
-                    <button onclick="saveOps()" class="w-full bg-blue-600 text-white py-4 rounded-xl font-bold shadow-lg shadow-blue-100">Enregistrer l'opération</button>
-                </div>
-            </section>
-
-            <section id="view-engines" class="tab-content hidden space-y-4">
-                <div id="engine-list" class="space-y-4">
+                    
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalVolume">0 m³</div>
+                        <div class="stat-label">Volume dredgé</div>
                     </div>
-            </section>
+                    
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalFuel">0 L</div>
+                        <div class="stat-label">Carburant consommé</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-value" id="efficiency">0 L/m³</div>
+                        <div class="stat-label">Efficacité</div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-            <section id="view-fuel" class="tab-content hidden space-y-4 text-center">
-                <div class="card p-6 bg-blue-600 text-white">
-                    <p class="text-sm opacity-80 uppercase font-bold tracking-tighter">Stock Total Disponible</p>
-                    <h2 class="text-4xl font-black mt-1" id="stock-fuel">0 <small class="text-lg">L</small></h2>
+        <!-- Motors Screen -->
+        <div id="motorsScreen" class="screen">
+            <div class="card" id="motorsContainer">
+                <!-- Motors will be dynamically loaded here -->
+            </div>
+            
+            <div class="card">
+                <h3 class="card-title">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Anomalies / Pannes
+                </h3>
+                
+                <div class="form-group">
+                    <label class="form-label">Description de l'anomalie</label>
+                    <textarea class="form-input" id="issueDescription" rows="4" placeholder="Décrivez le problème rencontré..."></textarea>
                 </div>
-                <div class="card p-5 text-left">
-                    <h3 class="font-bold mb-4">Ravitaillement</h3>
-                    <input type="number" id="fuel-input" class="input-smart" placeholder="Quantité en Litres">
-                    <button onclick="updateFuel()" class="w-full bg-slate-800 text-white py-4 rounded-xl mt-4 font-bold">Mettre à jour le stock</button>
-                </div>
-            </section>
+                
+                <button class="btn btn-warning" onclick="reportIssue()">
+                    <i class="fas fa-exclamation-circle"></i> Signaler une panne
+                </button>
+            </div>
+        </div>
 
-            <section id="view-reports" class="tab-content hidden text-center py-10">
-                <div class="card p-8">
-                    <i class="fas fa-file-pdf text-5xl text-blue-200 mb-4"></i>
-                    <h3 class="text-lg font-bold">Exportation PDF</h3>
-                    <p class="text-sm text-slate-500 mb-6">Générez un rapport complet des activités hebdomadaires.</p>
-                    <button onclick="window.print()" class="w-full bg-slate-100 border border-slate-300 py-3 rounded-xl font-bold text-slate-700">Imprimer le rapport</button>
+        <!-- Fuel Screen -->
+        <div id="fuelScreen" class="screen">
+            <!-- Current Fuel Level -->
+            <div class="card">
+                <h3 class="card-title">
+                    <i class="fas fa-oil-can"></i>
+                    Niveau de carburant actuel
+                </h3>
+                
+                <div class="fuel-level">
+                    <div class="fuel-fill" id="fuelFill"></div>
+                    <div class="fuel-percentage" id="fuelPercentage">65%</div>
                 </div>
-            </section>
-        </main>
+                
+                <div class="text-center">
+                    <div class="stat-value" id="fuelAmount">6,500 L</div>
+                    <div class="stat-label">Stock disponible</div>
+                </div>
+            </div>
+
+            <!-- Refueling -->
+            <div class="card">
+                <h3 class="card-title">
+                    <i class="fas fa-truck-moving"></i>
+                    Ravitaillement
+                </h3>
+                
+                <div class="form-group">
+                    <label class="form-label">Quantité ajoutée (litres)</label>
+                    <input type="number" class="form-input" id="refuelAmount" placeholder="0" min="0">
+                </div>
+                
+                <button class="btn btn-primary" onclick="addFuel()">
+                    <i class="fas fa-plus-circle"></i> Ajouter au stock
+                </button>
+            </div>
+
+            <!-- Fuel History -->
+            <div class="card">
+                <h3 class="card-title">
+                    <i class="fas fa-history"></i>
+                    Historique carburant
+                </h3>
+                
+                <div id="fuelHistory">
+                    <!-- Fuel history will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Reports Screen -->
+        <div id="reportsScreen" class="screen">
+            <!-- Report Generation -->
+            <div class="card">
+                <h3 class="card-title">
+                    <i class="fas fa-file-alt"></i>
+                    Générer un rapport
+                </h3>
+                
+                <div class="form-group">
+                    <label class="form-label">Type de rapport</label>
+                    <select class="select-input" id="reportType">
+                        <option value="weekly">Hebdomadaire</option>
+                        <option value="monthly">Mensuel</option>
+                        <option value="custom">Personnalisé</option>
+                    </select>
+                </div>
+                
+                <div id="customDateRange" style="display: none;">
+                    <div class="form-group">
+                        <label class="form-label">Date de début</label>
+                        <input type="date" class="form-input" id="startDate">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Date de fin</label>
+                        <input type="date" class="form-input" id="endDate">
+                    </div>
+                </div>
+                
+                <button class="btn btn-primary mb-4" onclick="generateReport()">
+                    <i class="fas fa-chart-pie"></i> Générer le rapport
+                </button>
+                
+                <button class="btn btn-success" onclick="exportPDF()">
+                    <i class="fas fa-file-pdf"></i> Exporter en PDF
+                </button>
+            </div>
+
+            <!-- Report List -->
+            <div class="card">
+                <h3 class="card-title">
+                    <i class="fas fa-folder-open"></i>
+                    Rapports récents
+                </h3>
+                
+                <div id="reportsList">
+                    <!-- Reports will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Notification -->
+    <div id="notification" class="notification">
+        <i class="fas fa-check-circle"></i> <span id="notificationText">Opération réussie</span>
     </div>
 
     <script>
-        // FIREBASE CONFIG
-        const firebaseConfig = {
-            apiKey: "AIzaSyBJxyFwFseINtXqdEU0JYESl6zQYVj0hSw",
-            authDomain: "sotutrasm-manager.firebaseapp.com",
-            projectId: "sotutrasm-manager",
-            storageBucket: "sotutrasm-manager.firebasestorage.app",
-            messagingSenderId: "452756329466",
-            appId: "1:452756329466:web:8c5b54a2818e4602874a43"
+        // Application State
+        let state = {
+            currentDredge: null,
+            selectedDredge: null,
+            timer: {
+                running: false,
+                startTime: null,
+                elapsedTime: 0,
+                interval: null
+            },
+            operations: [],
+            motors: {
+                'blue-shark': [
+                    { id: 1, name: 'CAT C32', hours: 1250, lastOilChange: 1150, issues: [] },
+                    { id: 2, name: 'CAT 3406', hours: 980, lastOilChange: 850, issues: [] },
+                    { id: 3, name: 'CAT 3512', hours: 2100, lastOilChange: 1950, issues: [] }
+                ],
+                'white-shark': [
+                    { id: 1, name: 'CAT 3512', hours: 3200, lastOilChange: 3050, issues: [] }
+                ]
+            },
+            fuel: {
+                current: 6500,
+                capacity: 10000,
+                history: [
+                    { date: '2024-01-15', type: 'refuel', amount: 2000, operator: 'Jean Dupont' },
+                    { date: '2024-01-14', type: 'consumption', amount: -350, operator: 'Blue Shark' },
+                    { date: '2024-01-12', type: 'refuel', amount: 1500, operator: 'Jean Dupont' }
+                ]
+            },
+            reports: [
+                { id: 1, type: 'weekly', period: '08-14 Jan 2024', date: '2024-01-15' },
+                { id: 2, type: 'monthly', period: 'Décembre 2023', date: '2024-01-01' },
+                { id: 3, type: 'weekly', period: '01-07 Jan 2024', date: '2024-01-08' }
+            ]
         };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
 
-        let currentDrague = "";
-        let timer = null;
-        let seconds = 0;
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            loadFromLocalStorage();
+            updateFuelDisplay();
+            loadReports();
+            updateDashboard();
+            
+            // Check if dredge is already selected
+            if (state.selectedDredge) {
+                showMainApp();
+            }
+            
+            // Set up event listeners
+            document.getElementById('reportType').addEventListener('change', function() {
+                document.getElementById('customDateRange').style.display = 
+                    this.value === 'custom' ? 'block' : 'none';
+            });
+        });
 
-        function selectDrague(name) {
-            currentDrague = name;
-            document.getElementById('view-selection').classList.add('hidden');
-            document.getElementById('main-app').classList.remove('hidden');
-            document.getElementById('display-drague').innerText = name;
-            initEngines();
-            loadFuel();
+        // Dredge Selection
+        function selectDredge(dredgeType) {
+            state.selectedDredge = dredgeType;
+            state.currentDredge = dredgeType === 'blue-shark' ? 'Blue Shark' : 'White Shark';
+            
+            document.getElementById('currentDredge').innerHTML = `
+                <strong>${state.currentDredge}</strong>
+            `;
+            
+            // Highlight selected dredge card
+            document.querySelectorAll('.dredge-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            event.currentTarget.classList.add('selected');
+            
+            // Load motors for selected dredge
+            loadMotors();
+            
+            // Show confirmation and switch to main app after delay
+            showNotification('Drague sélectionnée avec succès');
+            setTimeout(showMainApp, 1000);
         }
 
-        function showTab(id) {
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
-            document.querySelectorAll('nav button').forEach(b => b.classList.remove('tab-active'));
-            document.getElementById('view-' + id).classList.remove('hidden');
-            document.getElementById('tab-' + id).classList.add('tab-active');
+        function showMainApp() {
+            document.getElementById('dredgeSelection').classList.remove('active');
+            document.getElementById('operationsScreen').classList.add('active');
+            saveToLocalStorage();
         }
 
+        // Timer Functions
         function startTimer() {
-            if (timer) return;
-            timer = setInterval(() => {
-                seconds++;
-                let h = Math.floor(seconds/3600).toString().padStart(2,'0');
-                let m = Math.floor((seconds%3600)/60).toString().padStart(2,'0');
-                let s = (seconds%60).toString().padStart(2,'0');
-                document.getElementById('timer-display').innerText = `${h}:${m}:${s}`;
-            }, 1000);
-            document.getElementById('btn-start').classList.add('opacity-50');
+            if (!state.timer.running) {
+                state.timer.running = true;
+                state.timer.startTime = Date.now() - state.timer.elapsedTime;
+                
+                state.timer.interval = setInterval(updateTimerDisplay, 1000);
+                
+                document.getElementById('startBtn').style.display = 'none';
+                document.getElementById('pauseBtn').style.display = 'flex';
+            }
+        }
+
+        function pauseTimer() {
+            if (state.timer.running) {
+                state.timer.running = false;
+                clearInterval(state.timer.interval);
+                
+                document.getElementById('startBtn').style.display = 'flex';
+                document.getElementById('pauseBtn').style.display = 'none';
+            }
         }
 
         function stopTimer() {
-            clearInterval(timer);
-            timer = null;
-            document.getElementById('btn-start').classList.remove('opacity-50');
-            alert("Temps enregistré: " + document.getElementById('timer-display').innerText);
+            state.timer.running = false;
+            clearInterval(state.timer.interval);
+            state.timer.elapsedTime = 0;
+            
+            document.getElementById('startBtn').style.display = 'flex';
+            document.getElementById('pauseBtn').style.display = 'none';
+            document.getElementById('timerDisplay').textContent = '00:00:00';
+            
+            // Record the operation
+            if (state.timer.startTime) {
+                const duration = Date.now() - state.timer.startTime;
+                const hours = Math.floor(duration / 3600000);
+                const minutes = Math.floor((duration % 3600000) / 60000);
+                
+                state.operations.push({
+                    date: new Date().toISOString().split('T')[0],
+                    duration: { hours, minutes },
+                    dredge: state.currentDredge,
+                    driver: document.getElementById('driverName').value
+                });
+                
+                updateDashboard();
+                saveToLocalStorage();
+                showNotification('Travail enregistré avec succès');
+            }
         }
 
-        function initEngines() {
-            const list = document.getElementById('engine-list');
-            const engines = currentDrague === "Blue Shark" ? ["CAT C32", "CAT 3406", "IVECO"] : ["CAT 3512"];
-            list.innerHTML = engines.map(e => `
-                <div class="card p-5">
-                    <h4 class="font-black text-blue-700 mb-4">${e}</h4>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <p class="text-[10px] uppercase font-bold text-slate-400">Heures Moteur</p>
-                            <input type="number" class="w-full text-lg font-bold border-b py-1 outline-none" placeholder="00.0">
+        function updateTimerDisplay() {
+            if (state.timer.running) {
+                const elapsed = Date.now() - state.timer.startTime;
+                state.timer.elapsedTime = elapsed;
+                
+                const hours = Math.floor(elapsed / 3600000).toString().padStart(2, '0');
+                const minutes = Math.floor((elapsed % 3600000) / 60000).toString().padStart(2, '0');
+                const seconds = Math.floor((elapsed % 60000) / 1000).toString().padStart(2, '0');
+                
+                document.getElementById('timerDisplay').textContent = `${hours}:${minutes}:${seconds}`;
+            }
+        }
+
+        // Operations Functions
+        function saveOperation() {
+            const length = parseFloat(document.getElementById('length').value) || 0;
+            const width = parseFloat(document.getElementById('width').value) || 0;
+            const depth = parseFloat(document.getElementById('depth').value) || 0;
+            const fuel = parseFloat(document.getElementById('fuelConsumed').value) || 0;
+            
+            if (length === 0 || width === 0 || depth === 0) {
+                showNotification('Veuillez remplir les dimensions', 'warning');
+                return;
+            }
+            
+            const volume = (length * width * depth).toFixed(2);
+            
+            // Update fuel
+            if (fuel > 0) {
+                state.fuel.current -= fuel;
+                state.fuel.history.unshift({
+                    date: new Date().toISOString().split('T')[0],
+                    type: 'consumption',
+                    amount: -fuel,
+                    operator: document.getElementById('driverName').value || 'Inconnu'
+                });
+                updateFuelDisplay();
+            }
+            
+            // Add to operations
+            state.operations.push({
+                date: new Date().toISOString(),
+                dimensions: { length, width, depth },
+                volume: parseFloat(volume),
+                fuelConsumed: fuel,
+                driver: document.getElementById('driverName').value,
+                team: document.getElementById('teamMembers').value
+            });
+            
+            // Clear form
+            document.getElementById('length').value = '';
+            document.getElementById('width').value = '';
+            document.getElementById('depth').value = '';
+            document.getElementById('fuelConsumed').value = '';
+            
+            updateDashboard();
+            saveToLocalStorage();
+            showNotification('Opération enregistrée avec succès');
+        }
+
+        // Motors Functions
+        function loadMotors() {
+            const container = document.getElementById('motorsContainer');
+            const motors = state.motors[state.selectedDredge];
+            
+            let html = '<h3 class="card-title"><i class="fas fa-cogs"></i> Suivi des moteurs</h3>';
+            
+            motors.forEach(motor => {
+                const hoursToNextOil = 250 - (motor.hours - motor.lastOilChange);
+                const oilChangeNeeded = hoursToNextOil <= 0;
+                
+                html += `
+                    <div class="motor-section">
+                        <div class="motor-card card">
+                            <div class="motor-info">
+                                <div class="motor-name">${motor.name}</div>
+                                <div class="motor-hours">${motor.hours} h</div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <strong>Prochaine vidange:</strong> 
+                                <span class="${oilChangeNeeded ? 'text-danger' : 'text-success'}">
+                                    ${motor.lastOilChange + 250} h
+                                </span>
+                                <small class="text-dark-gray"> (dans ${hoursToNextOil} heures)</small>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Ajouter des heures</label>
+                                <input type="number" class="form-input add-hours" 
+                                       data-motor-id="${motor.id}"
+                                       placeholder="Heures travaillées"
+                                       min="0" step="0.5">
+                            </div>
+                            
+                            <button class="btn ${oilChangeNeeded ? 'btn-danger' : 'btn-outline'}" 
+                                    onclick="performOilChange(${motor.id})">
+                                <i class="fas fa-oil-can"></i> Vidange effectuée
+                            </button>
+                            
+                            ${motor.issues.length > 0 ? `
+                                <div class="mt-3">
+                                    <strong>Anomalies signalées:</strong>
+                                    <ul class="mt-1" style="padding-left: 20px;">
+                                        ${motor.issues.map(issue => `<li>${issue}</li>`).join('')}
+                                    </ul>
+                                </div>
+                            ` : ''}
                         </div>
-                        <button class="bg-blue-50 text-blue-600 rounded-xl text-xs font-bold py-2 border border-blue-100">Action Vidange</button>
                     </div>
-                </div>
-            `).join('');
-        }
-
-        function updateFuel() {
-            const val = document.getElementById('fuel-input').value;
-            if(!val) return;
-            db.collection("fuel").add({
-                drague: currentDrague,
-                quantite: parseFloat(val),
-                ts: firebase.firestore.FieldValue.serverTimestamp()
-            }).then(() => {
-                document.getElementById('fuel-input').value = "";
-                loadFuel();
+                `;
+            });
+            
+            container.innerHTML = html;
+            
+            // Add event listeners for hour inputs
+            document.querySelectorAll('.add-hours').forEach(input => {
+                input.addEventListener('change', function() {
+                    const hours = parseFloat(this.value) || 0;
+                    const motorId = parseInt(this.dataset.motorId);
+                    if (hours > 0) {
+                        addMotorHours(motorId, hours);
+                        this.value = '';
+                    }
+                });
             });
         }
 
-        function loadFuel() {
-            db.collection("fuel").onSnapshot(snap => {
-                let total = 0;
-                snap.forEach(doc => total += doc.data().quantite);
-                document.getElementById('stock-fuel').innerText = total + " L";
+        function addMotorHours(motorId, hours) {
+            const motors = state.motors[state.selectedDredge];
+            const motor = motors.find(m => m.id === motorId);
+            
+            if (motor) {
+                motor.hours += hours;
+                showNotification(`${hours} heures ajoutées au moteur ${motor.name}`);
+                loadMotors();
+                saveToLocalStorage();
+            }
+        }
+
+        function performOilChange(motorId) {
+            const motors = state.motors[state.selectedDredge];
+            const motor = motors.find(m => m.id === motorId);
+            
+            if (motor) {
+                motor.lastOilChange = motor.hours;
+                showNotification(`Vidange enregistrée pour ${motor.name}`);
+                loadMotors();
+                saveToLocalStorage();
+            }
+        }
+
+        function reportIssue() {
+            const description = document.getElementById('issueDescription').value.trim();
+            
+            if (!description) {
+                showNotification('Veuillez décrire le problème', 'warning');
+                return;
+            }
+            
+            // For simplicity, add to first motor
+            if (state.motors[state.selectedDredge].length > 0) {
+                state.motors[state.selectedDredge][0].issues.push(
+                    `${new Date().toLocaleDateString()}: ${description}`
+                );
+            }
+            
+            document.getElementById('issueDescription').value = '';
+            loadMotors();
+            showNotification('Anomalie signalée avec succès');
+            saveToLocalStorage();
+        }
+
+        // Fuel Functions
+        function updateFuelDisplay() {
+            const percentage = Math.round((state.fuel.current / state.fuel.capacity) * 100);
+            
+            document.getElementById('fuelFill').style.width = `${percentage}%`;
+            document.getElementById('fuelPercentage').textContent = `${percentage}%`;
+            document.getElementById('fuelAmount').textContent = `${state.fuel.current.toLocaleString()} L`;
+            
+            loadFuelHistory();
+        }
+
+        function addFuel() {
+            const amount = parseFloat(document.getElementById('refuelAmount').value) || 0;
+            
+            if (amount <= 0) {
+                showNotification('Veuillez entrer une quantité valide', 'warning');
+                return;
+            }
+            
+            if (state.fuel.current + amount > state.fuel.capacity) {
+                showNotification('Capacité maximale dépassée', 'warning');
+                return;
+            }
+            
+            state.fuel.current += amount;
+            state.fuel.history.unshift({
+                date: new Date().toISOString().split('T')[0],
+                type: 'refuel',
+                amount: amount,
+                operator: document.getElementById('driverName').value || 'Inconnu'
             });
+            
+            document.getElementById('refuelAmount').value = '';
+            updateFuelDisplay();
+            saveToLocalStorage();
+            showNotification(`${amount} L ajoutés au stock`);
+        }
+
+        function loadFuelHistory() {
+            const container = document.getElementById('fuelHistory');
+            let html = '';
+            
+            state.fuel.history.slice(0, 10).forEach(entry => {
+                const icon = entry.type === 'refuel' ? 'fa-plus-circle text-success' : 'fa-minus-circle text-danger';
+                const sign = entry.type === 'refuel' ? '+' : '';
+                
+                html += `
+                    <div class="report-item">
+                        <div class="report-info">
+                            <h4>${entry.operator}</h4>
+                            <div class="report-date">${entry.date}</div>
+                        </div>
+                        <div>
+                            <i class="fas ${icon}"></i>
+                            <strong>${sign}${entry.amount} L</strong>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html || '<p class="text-center text-dark-gray">Aucun historique disponible</p>';
+        }
+
+        // Reports Functions
+        function loadReports() {
+            const container = document.getElementById('reportsList');
+            let html = '';
+            
+            state.reports.forEach(report => {
+                const icon = report.type === 'weekly' ? 'fa-calendar-week' : 'fa-calendar-alt';
+                const typeText = report.type === 'weekly' ? 'Hebdomadaire' : 'Mensuel';
+                
+                html += `
+                    <div class="report-item">
+                        <div class="report-info">
+                            <h4>Rapport ${typeText}</h4>
+                            <div class="report-date">${report.period} • Généré le ${report.date}</div>
+                        </div>
+                        <div>
+                            <button class="btn btn-outline btn-sm" onclick="viewReport(${report.id})">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="btn btn-primary btn-sm" onclick="downloadReport(${report.id})">
+                                <i class="fas fa-download"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html || '<p class="text-center text-dark-gray">Aucun rapport disponible</p>';
+        }
+
+        function generateReport() {
+            const type = document.getElementById('reportType').value;
+            
+            // Create a new report
+            const today = new Date();
+            let period = '';
+            
+            if (type === 'weekly') {
+                const startDate = new Date(today);
+                startDate.setDate(today.getDate() - 7);
+                period = `${startDate.toLocaleDateString()} - ${today.toLocaleDateString()}`;
+            } else if (type === 'monthly') {
+                period = today.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+            } else {
+                const start = document.getElementById('startDate').value;
+                const end = document.getElementById('endDate').value;
+                period = `${start} - ${end}`;
+            }
+            
+            const newReport = {
+                id: state.reports.length + 1,
+                type: type,
+                period: period,
+                date: today.toISOString().split('T')[0]
+            };
+            
+            state.reports.unshift(newReport);
+            loadReports();
+            saveToLocalStorage();
+            showNotification('Rapport généré avec succès');
+        }
+
+        function viewReport(reportId) {
+            const report = state.reports.find(r => r.id === reportId);
+            if (report) {
+                alert(`Vue du rapport ${report.type} pour la période ${report.period}`);
+            }
+        }
+
+        function downloadReport(reportId) {
+            showNotification('Rapport téléchargé (simulation)');
+            // In a real app, this would generate and download a PDF
+        }
+
+        function exportPDF() {
+            showNotification('PDF généré avec succès (simulation)');
+            // In a real app, this would generate a PDF report
+        }
+
+        // Dashboard Functions
+        function updateDashboard() {
+            // Calculate totals
+            let totalHours = 0;
+            let totalVolume = 0;
+            let totalFuel = 0;
+            
+            state.operations.forEach(op => {
+                if (op.duration) {
+                    totalHours += op.duration.hours + (op.duration.minutes / 60);
+                }
+                if (op.volume) {
+                    totalVolume += op.volume;
+                }
+                if (op.fuelConsumed) {
+                    totalFuel += op.fuelConsumed;
+                }
+            });
+            
+            // Update display
+            document.getElementById('totalHours').textContent = 
+                `${Math.floor(totalHours)}h${Math.round((totalHours % 1) * 60)}`;
+            
+            document.getElementById('totalVolume').textContent = 
+                `${totalVolume.toFixed(1)} m³`;
+            
+            document.getElementById('totalFuel').textContent = 
+                `${totalFuel.toFixed(0)} L`;
+            
+            const efficiency = totalVolume > 0 ? (totalFuel / totalVolume).toFixed(1) : 0;
+            document.getElementById('efficiency').textContent = 
+                `${efficiency} L/m³`;
+        }
+
+        // Navigation
+        function showTab(tabName) {
+            // Update active tab
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
+            
+            // Hide all screens
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            
+            // Show selected screen
+            document.getElementById(`${tabName}Screen`).classList.add('active');
+            
+            // Update data if needed
+            if (tabName === 'motors') {
+                loadMotors();
+            } else if (tabName === 'fuel') {
+                updateFuelDisplay();
+            } else if (tabName === 'reports') {
+                loadReports();
+            }
+        }
+
+        // Notification System
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            const text = document.getElementById('notificationText');
+            
+            // Set color based on type
+            notification.style.backgroundColor = 
+                type === 'success' ? '#10b981' : 
+                type === 'warning' ? '#f59e0b' : '#ef4444';
+            
+            text.textContent = message;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Local Storage
+        function saveToLocalStorage() {
+            localStorage.setItem('sotutrasm_data', JSON.stringify(state));
+        }
+
+        function loadFromLocalStorage() {
+            const saved = localStorage.getItem('sotutrasm_data');
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                state = { ...state, ...parsed };
+                
+                if (state.selectedDredge) {
+                    state.currentDredge = state.selectedDredge === 'blue-shark' ? 'Blue Shark' : 'White Shark';
+                    document.getElementById('currentDredge').innerHTML = `
+                        <strong>${state.currentDredge}</strong>
+                    `;
+                }
+            }
         }
     </script>
 </body>
