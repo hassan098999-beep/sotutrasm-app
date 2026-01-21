@@ -3,1697 +3,215 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SOTUTRASM - Suivi Dredging</title>
+    <title>SOTUTRASM PRO V8.1</title>
     
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
     
-    <!-- Font Awesome -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        :root {
-            --primary: #2563eb;
-            --primary-light: #3b82f6;
-            --secondary: #10b981;
-            --danger: #ef4444;
-            --warning: #f59e0b;
-            --light: #ffffff;
-            --light-gray: #f8fafc;
-            --gray: #94a3b8;
-            --dark-gray: #64748b;
-            --text: #1e293b;
-            --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            --border-radius: 16px;
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap');
         
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f3f4f6; color: #1f2937; }
         
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--light-gray);
-            color: var(--text);
-            line-height: 1.5;
-            max-width: 100%;
-            overflow-x: hidden;
-            padding-bottom: 80px;
-        }
+        .premium-card { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border-radius: 24px; border: 1px solid rgba(255, 255, 255, 0.4); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05); }
         
-        .container {
-            width: 100%;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 0 16px;
-        }
+        .active-tab { background-color: #2563eb !important; color: white !important; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); }
         
-        /* Header */
-        .header {
-            background-color: var(--light);
-            padding: 16px;
-            box-shadow: var(--card-shadow);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
+        .engine-progress { height: 8px; border-radius: 4px; background: #e5e7eb; overflow: hidden; }
+        .engine-progress-bar { height: 100%; background: linear-gradient(90deg, #3b82f6, #2563eb); transition: width 0.5s ease; }
         
-        .header-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        
-        .logo-icon {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, var(--primary), var(--primary-light));
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 18px;
-            font-weight: 600;
-        }
-        
-        .logo-text {
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--primary);
-        }
-        
-        /* Switch Dredge Button */
-        .switch-dredge-btn {
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            transition: all 0.3s;
-        }
-        
-        .switch-dredge-btn:hover {
-            background-color: var(--primary-light);
-            transform: translateY(-1px);
-        }
-        
-        .switch-dredge-btn i {
-            font-size: 12px;
-        }
-        
-        /* Control Buttons */
-        .control-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 16px;
-            flex-wrap: wrap;
-        }
-        
-        .control-btn {
-            background-color: var(--light);
-            border: 2px solid var(--gray);
-            color: var(--text);
-            padding: 10px 16px;
-            border-radius: 10px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            transition: all 0.3s;
-            flex: 1;
-            min-width: 120px;
-            justify-content: center;
-        }
-        
-        .control-btn:hover {
-            border-color: var(--primary);
-            color: var(--primary);
-        }
-        
-        .control-btn.danger {
-            border-color: var(--danger);
-            color: var(--danger);
-        }
-        
-        .control-btn.danger:hover {
-            background-color: var(--danger);
-            color: white;
-        }
-        
-        /* Navigation */
-        .nav-tabs {
-            display: flex;
-            background-color: var(--light);
-            border-bottom: 1px solid #e2e8f0;
-            position: sticky;
-            top: 72px;
-            z-index: 99;
-        }
-        
-        .nav-tab {
-            flex: 1;
-            padding: 16px;
-            text-align: center;
-            font-weight: 500;
-            color: var(--dark-gray);
-            border-bottom: 3px solid transparent;
-            transition: all 0.3s;
-        }
-        
-        .nav-tab.active {
-            color: var(--primary);
-            border-bottom-color: var(--primary);
-        }
-        
-        .nav-tab i {
-            display: block;
-            margin-bottom: 6px;
-            font-size: 20px;
-        }
-        
-        /* Screens */
-        .screen {
-            display: none;
-            animation: fadeIn 0.3s ease-out;
-        }
-        
-        .screen.active {
-            display: block;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        /* Cards */
-        .card {
-            background-color: var(--light);
-            border-radius: var(--border-radius);
-            padding: 20px;
-            margin-bottom: 16px;
-            box-shadow: var(--card-shadow);
-        }
-        
-        .card-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        /* Buttons */
-        .btn {
-            padding: 14px 24px;
-            border-radius: 12px;
-            font-weight: 500;
-            font-size: 16px;
-            border: none;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        
-        .btn-primary {
-            background-color: var(--primary);
-            color: white;
-        }
-        
-        .btn-primary:hover {
-            background-color: var(--primary-light);
-        }
-        
-        .btn-success {
-            background-color: var(--secondary);
-            color: white;
-        }
-        
-        .btn-danger {
-            background-color: var(--danger);
-            color: white;
-        }
-        
-        .btn-warning {
-            background-color: var(--warning);
-            color: white;
-        }
-        
-        .btn-outline {
-            background-color: transparent;
-            border: 2px solid var(--primary);
-            color: var(--primary);
-        }
-        
-        /* Form Elements */
-        .form-group {
-            margin-bottom: 16px;
-        }
-        
-        .form-label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: var(--text);
-        }
-        
-        .form-input {
-            width: 100%;
-            padding: 14px;
-            border: 2px solid #e2e8f0;
-            border-radius: 10px;
-            font-size: 16px;
-            font-family: 'Inter', sans-serif;
-            transition: border-color 0.3s;
-        }
-        
-        .form-input:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
-        
-        .select-input {
-            width: 100%;
-            padding: 14px;
-            border: 2px solid #e2e8f0;
-            border-radius: 10px;
-            font-size: 16px;
-            font-family: 'Inter', sans-serif;
-            background-color: white;
-            cursor: pointer;
-        }
-        
-        /* Timer */
-        .timer-container {
-            background: linear-gradient(135deg, var(--primary), var(--primary-light));
-            border-radius: var(--border-radius);
-            padding: 24px;
-            color: white;
-            text-align: center;
-            margin-bottom: 24px;
-        }
-        
-        .timer-display {
-            font-size: 48px;
-            font-weight: 700;
-            font-variant-numeric: tabular-nums;
-            margin-bottom: 16px;
-        }
-        
-        .timer-controls {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-        }
-        
-        /* Stats */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 12px;
-            margin-top: 20px;
-        }
-        
-        .stat-card {
-            background-color: var(--light);
-            border-radius: 12px;
-            padding: 16px;
-            text-align: center;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-        }
-        
-        .stat-value {
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 4px;
-        }
-        
-        .stat-label {
-            font-size: 14px;
-            color: var(--dark-gray);
-        }
-        
-        /* Motor Section */
-        .motor-section {
-            margin-bottom: 24px;
-        }
-        
-        .motor-card {
-            border-left: 4px solid var(--primary);
-            margin-bottom: 12px;
-        }
-        
-        .motor-info {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-        
-        .motor-name {
-            font-weight: 600;
-            font-size: 16px;
-        }
-        
-        .motor-hours {
-            font-weight: 700;
-            color: var(--primary);
-            font-size: 18px;
-        }
-        
-        /* Fuel Section */
-        .fuel-level {
-            height: 40px;
-            background-color: #e2e8f0;
-            border-radius: 20px;
-            margin: 20px 0;
-            overflow: hidden;
-            position: relative;
-        }
-        
-        .fuel-fill {
-            height: 100%;
-            background: linear-gradient(to right, var(--secondary), #34d399);
-            border-radius: 20px;
-            width: 65%;
-            transition: width 0.5s;
-        }
-        
-        .fuel-percentage {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-weight: 700;
-            color: var(--text);
-            font-size: 18px;
-        }
-        
-        /* Reports */
-        .report-item {
-            border-left: 4px solid var(--secondary);
-            margin-bottom: 12px;
-            padding: 12px 16px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .report-info h4 {
-            font-weight: 600;
-            margin-bottom: 4px;
-        }
-        
-        .report-date {
-            color: var(--dark-gray);
-            font-size: 14px;
-        }
-        
-        /* Dredge Selection */
-        .dredge-selection {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 16px;
-            max-width: 400px;
-            margin: 40px auto;
-        }
-        
-        .dredge-card {
-            background-color: var(--light);
-            border-radius: var(--border-radius);
-            padding: 32px 24px;
-            text-align: center;
-            box-shadow: var(--card-shadow);
-            cursor: pointer;
-            transition: transform 0.3s, box-shadow 0.3s;
-            border: 3px solid transparent;
-        }
-        
-        .dredge-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-        }
-        
-        .dredge-card.selected {
-            border-color: var(--primary);
-        }
-        
-        .dredge-icon {
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(135deg, var(--primary), var(--primary-light));
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 16px;
-            color: white;
-            font-size: 32px;
-        }
-        
-        .dredge-name {
-            font-size: 22px;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-        
-        .dredge-info {
-            color: var(--dark-gray);
-            font-size: 14px;
-        }
-        
-        /* Utility Classes */
-        .text-center { text-align: center; }
-        .mt-1 { margin-top: 4px; }
-        .mt-2 { margin-top: 8px; }
-        .mt-3 { margin-top: 12px; }
-        .mt-4 { margin-top: 16px; }
-        .mt-5 { margin-top: 24px; }
-        .mb-1 { margin-bottom: 4px; }
-        .mb-2 { margin-bottom: 8px; }
-        .mb-3 { margin-bottom: 12px; }
-        .mb-4 { margin-bottom: 16px; }
-        .mb-5 { margin-bottom: 24px; }
-        
-        /* Responsive */
-        @media (max-width: 600px) {
-            .container {
-                padding: 0 12px;
-            }
-            
-            .timer-display {
-                font-size: 36px;
-            }
-            
-            .stats-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-            
-            .nav-tab span {
-                font-size: 12px;
-            }
-            
-            .control-buttons {
-                flex-direction: column;
-            }
-            
-            .control-btn {
-                min-width: 100%;
-            }
-        }
-        
-        /* Loading */
-        .loading {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 200px;
-        }
-        
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid #e2e8f0;
-            border-top-color: var(--primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
-        /* Notification */
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background-color: var(--secondary);
-            color: white;
-            padding: 16px 24px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            z-index: 1000;
-            transform: translateX(120%);
-            transition: transform 0.3s;
-        }
-        
-        .notification.show {
-            transform: translateX(0);
-        }
-        
-        /* Reset Data Modal */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(0, 0, 0, 0.5);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 2000;
-            padding: 20px;
-        }
-        
-        .modal {
-            background-color: var(--light);
-            border-radius: var(--border-radius);
-            padding: 24px;
-            max-width: 400px;
-            width: 100%;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-        }
-        
-        .modal-title {
-            font-size: 20px;
-            font-weight: 600;
-            margin-bottom: 16px;
-            color: var(--text);
-        }
-        
-        .modal-text {
-            color: var(--dark-gray);
-            margin-bottom: 24px;
-            line-height: 1.6;
-        }
-        
-        .modal-actions {
-            display: flex;
-            gap: 12px;
-            justify-content: flex-end;
-        }
+        .btn-action { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+        .btn-action:active { transform: scale(0.95); }
+
+        /* Hide Scrollbar */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
-<body>
-    <!-- Header -->
-    <header class="header">
-        <div class="header-content container">
-            <div class="logo">
-                <div class="logo-icon">S</div>
-                <div class="logo-text">SOTUTRASM</div>
-            </div>
-            <div id="currentDredge" class="dredge-info">
-                <!-- Dynamically filled -->
-            </div>
-        </div>
-    </header>
+<body class="min-h-screen">
 
-    <!-- Navigation Tabs -->
-    <nav class="nav-tabs">
-        <div class="nav-tab active" onclick="showTab('operations')">
-            <i class="fas fa-tasks"></i>
-            <span>Opérations</span>
-        </div>
-        <div class="nav-tab" onclick="showTab('motors')">
-            <i class="fas fa-cogs"></i>
-            <span>Moteurs</span>
-        </div>
-        <div class="nav-tab" onclick="showTab('fuel')">
-            <i class="fas fa-gas-pump"></i>
-            <span>Carburant</span>
-        </div>
-        <div class="nav-tab" onclick="showTab('reports')">
-            <i class="fas fa-chart-bar"></i>
-            <span>Rapports</span>
-        </div>
-    </nav>
-
-    <!-- Main Content -->
-    <main class="container">
-        <!-- Dredge Selection Screen -->
-        <div id="dredgeSelection" class="screen active">
-            <div class="text-center mt-5">
-                <h1 style="font-size: 28px; margin-bottom: 12px; color: var(--primary);">Sélectionnez votre drague</h1>
-                <p style="color: var(--dark-gray); margin-bottom: 40px;">Choisissez la drague pour laquelle vous allez travailler aujourd'hui</p>
+    <div id="view-auth" class="min-h-screen flex items-center justify-center p-6 bg-slate-50">
+        <div class="w-full max-w-md text-center">
+            <div class="mb-8">
+                <div class="w-20 h-20 bg-blue-600 rounded-3xl mx-auto flex items-center justify-center shadow-xl shadow-blue-200 mb-4">
+                    <i class="fas fa-ship text-white text-3xl"></i>
+                </div>
+                <h1 class="text-3xl font-extrabold tracking-tight text-slate-900">SOTUTRASM</h1>
+                <p class="text-slate-500 font-medium">Smart Dredging Solutions</p>
             </div>
-            
-            <div class="dredge-selection">
-                <div class="dredge-card" onclick="selectDredge('blue-shark')">
-                    <div class="dredge-icon">
-                        <i class="fas fa-ship"></i>
-                    </div>
-                    <div class="dredge-name">Blue Shark</div>
-                    <div class="dredge-info">3 moteurs • CAT C32, CAT 3406, IVECO</div>
-                </div>
-                
-                <div class="dredge-card" onclick="selectDredge('white-shark')">
-                    <div class="dredge-icon">
-                        <i class="fas fa-ship"></i>
-                    </div>
-                    <div class="dredge-name">White Shark</div>
-                    <div class="dredge-info">1 moteur • CAT 3512</div>
-                </div>
-            </div>
-            
-            <!-- Control Buttons -->
-            <div class="card mt-4">
-                <div class="control-buttons">
-                    <button class="control-btn" onclick="resetAllData()">
-                        <i class="fas fa-trash-alt"></i>
-                        Réinitialiser toutes les données
-                    </button>
-                    <button class="control-btn" onclick="resetTodayData()">
-                        <i class="fas fa-redo"></i>
-                        Réinitialiser données du jour
-                    </button>
-                    <button class="control-btn" onclick="clearTimer()">
-                        <i class="fas fa-stopwatch"></i>
-                        Réinitialiser minuteur
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Operations Screen -->
-        <div id="operationsScreen" class="screen">
-            <!-- Control Bar -->
-            <div class="card mb-4">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <div>
-                        <h3 style="font-weight: 600; color: var(--primary);" id="currentDredgeTitle">
-                            Blue Shark
-                        </h3>
-                        <p style="color: var(--dark-gray); font-size: 14px;">Session en cours</p>
-                    </div>
-                    <button class="switch-dredge-btn" onclick="switchDredge()">
-                        <i class="fas fa-exchange-alt"></i>
-                        Changer de drague
-                    </button>
-                </div>
-                
-                <div class="control-buttons">
-                    <button class="control-btn" onclick="resetTodayData()">
-                        <i class="fas fa-redo"></i>
-                        Réinitialiser jour
-                    </button>
-                    <button class="control-btn" onclick="clearTimer()">
-                        <i class="fas fa-stopwatch"></i>
-                        Réinitialiser minuteur
-                    </button>
-                    <button class="control-btn danger" onclick="resetAllData()">
-                        <i class="fas fa-trash-alt"></i>
-                        Réinitialiser tout
-                    </button>
-                </div>
-            </div>
-
-            <!-- Timer Section -->
-            <div class="timer-container">
-                <div class="timer-display" id="timerDisplay">00:00:00</div>
-                <div class="timer-controls">
-                    <button class="btn btn-success" onclick="startTimer()" id="startBtn">
-                        <i class="fas fa-play"></i> Démarrer
-                    </button>
-                    <button class="btn btn-warning" onclick="pauseTimer()" id="pauseBtn" style="display: none;">
-                        <i class="fas fa-pause"></i> Pause
-                    </button>
-                    <button class="btn btn-danger" onclick="stopTimer()">
-                        <i class="fas fa-stop"></i> Arrêter
-                    </button>
-                </div>
-            </div>
-
-            <!-- Driver Info -->
-            <div class="card">
-                <h3 class="card-title">
-                    <i class="fas fa-user"></i>
-                    Informations de l'équipe
-                </h3>
-                
-                <div class="form-group">
-                    <label class="form-label">Nom du chauffeur</label>
-                    <input type="text" class="form-input" id="driverName" placeholder="Entrez votre nom" value="Jean Dupont">
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Équipe accompagnante</label>
-                    <input type="text" class="form-input" id="teamMembers" placeholder="Noms des membres de l'équipe">
-                </div>
-            </div>
-
-            <!-- Operation Details -->
-            <div class="card">
-                <h3 class="card-title">
-                    <i class="fas fa-ruler-combined"></i>
-                    Dimensions de travail
-                </h3>
-                
-                <div class="form-group">
-                    <label class="form-label">Longueur (mètres)</label>
-                    <input type="number" class="form-input" id="length" placeholder="0.00" step="0.1" min="0">
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Largeur (mètres)</label>
-                    <input type="number" class="form-input" id="width" placeholder="0.00" step="0.1" min="0">
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Profondeur (mètres)</label>
-                    <input type="number" class="form-input" id="depth" placeholder="0.00" step="0.1" min="0">
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Carburant consommé (litres)</label>
-                    <input type="number" class="form-input" id="fuelConsumed" placeholder="0" min="0">
-                </div>
-                
-                <button class="btn btn-primary mt-4" onclick="saveOperation()">
-                    <i class="fas fa-save"></i> Enregistrer l'opération
-                </button>
-            </div>
-
-            <!-- Dashboard -->
-            <div class="card">
-                <h3 class="card-title">
-                    <i class="fas fa-chart-line"></i>
-                    Dashboard du jour
-                </h3>
-                
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-value" id="totalHours">00:00</div>
-                        <div class="stat-label">Heures travaillées</div>
-                    </div>
-                    
-                    <div class="stat-card">
-                        <div class="stat-value" id="totalVolume">0 m³</div>
-                        <div class="stat-label">Volume dredgé</div>
-                    </div>
-                    
-                    <div class="stat-card">
-                        <div class="stat-value" id="totalFuel">0 L</div>
-                        <div class="stat-label">Carburant consommé</div>
-                    </div>
-                    
-                    <div class="stat-card">
-                        <div class="stat-value" id="efficiency">0 L/m³</div>
-                        <div class="stat-label">Efficacité</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Motors Screen -->
-        <div id="motorsScreen" class="screen">
-            <div class="card" id="motorsContainer">
-                <!-- Motors will be dynamically loaded here -->
-            </div>
-            
-            <div class="card">
-                <h3 class="card-title">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    Anomalies / Pannes
-                </h3>
-                
-                <div class="form-group">
-                    <label class="form-label">Description de l'anomalie</label>
-                    <textarea class="form-input" id="issueDescription" rows="4" placeholder="Décrivez le problème rencontré..."></textarea>
-                </div>
-                
-                <button class="btn btn-warning" onclick="reportIssue()">
-                    <i class="fas fa-exclamation-circle"></i> Signaler une panne
-                </button>
-            </div>
-        </div>
-
-        <!-- Fuel Screen -->
-        <div id="fuelScreen" class="screen">
-            <!-- Current Fuel Level -->
-            <div class="card">
-                <h3 class="card-title">
-                    <i class="fas fa-oil-can"></i>
-                    Niveau de carburant actuel
-                </h3>
-                
-                <div class="fuel-level">
-                    <div class="fuel-fill" id="fuelFill"></div>
-                    <div class="fuel-percentage" id="fuelPercentage">65%</div>
-                </div>
-                
-                <div class="text-center">
-                    <div class="stat-value" id="fuelAmount">6,500 L</div>
-                    <div class="stat-label">Stock disponible</div>
-                </div>
-            </div>
-
-            <!-- Refueling -->
-            <div class="card">
-                <h3 class="card-title">
-                    <i class="fas fa-truck-moving"></i>
-                    Ravitaillement
-                </h3>
-                
-                <div class="form-group">
-                    <label class="form-label">Quantité ajoutée (litres)</label>
-                    <input type="number" class="form-input" id="refuelAmount" placeholder="0" min="0">
-                </div>
-                
-                <button class="btn btn-primary" onclick="addFuel()">
-                    <i class="fas fa-plus-circle"></i> Ajouter au stock
-                </button>
-            </div>
-
-            <!-- Fuel History -->
-            <div class="card">
-                <h3 class="card-title">
-                    <i class="fas fa-history"></i>
-                    Historique carburant
-                </h3>
-                
-                <div id="fuelHistory">
-                    <!-- Fuel history will be loaded here -->
-                </div>
-            </div>
-        </div>
-
-        <!-- Reports Screen -->
-        <div id="reportsScreen" class="screen">
-            <!-- Report Generation -->
-            <div class="card">
-                <h3 class="card-title">
-                    <i class="fas fa-file-alt"></i>
-                    Générer un rapport
-                </h3>
-                
-                <div class="form-group">
-                    <label class="form-label">Type de rapport</label>
-                    <select class="select-input" id="reportType">
-                        <option value="weekly">Hebdomadaire</option>
-                        <option value="monthly">Mensuel</option>
-                        <option value="custom">Personnalisé</option>
-                    </select>
-                </div>
-                
-                <div id="customDateRange" style="display: none;">
-                    <div class="form-group">
-                        <label class="form-label">Date de début</label>
-                        <input type="date" class="form-input" id="startDate">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Date de fin</label>
-                        <input type="date" class="form-input" id="endDate">
-                    </div>
-                </div>
-                
-                <button class="btn btn-primary mb-4" onclick="generateReport()">
-                    <i class="fas fa-chart-pie"></i> Générer le rapport
-                </button>
-                
-                <button class="btn btn-success" onclick="exportPDF()">
-                    <i class="fas fa-file-pdf"></i> Exporter en PDF
-                </button>
-            </div>
-
-            <!-- Report List -->
-            <div class="card">
-                <h3 class="card-title">
-                    <i class="fas fa-folder-open"></i>
-                    Rapports récents
-                </h3>
-                
-                <div id="reportsList">
-                    <!-- Reports will be loaded here -->
-                </div>
-            </div>
-        </div>
-    </main>
-
-    <!-- Reset Data Modal -->
-    <div id="resetModal" class="modal-overlay">
-        <div class="modal">
-            <div class="modal-title" id="resetModalTitle">Réinitialiser les données</div>
-            <div class="modal-text" id="resetModalText">
-                Êtes-vous sûr de vouloir réinitialiser toutes les données ? Cette action est irréversible.
-            </div>
-            <div class="modal-actions">
-                <button class="control-btn" onclick="closeResetModal()">Annuler</button>
-                <button class="control-btn danger" onclick="confirmReset()">Confirmer</button>
+            <div class="premium-card p-8 space-y-4">
+                <input type="email" id="auth-email" class="w-full p-4 rounded-2xl bg-white border border-slate-200 outline-none focus:border-blue-500" placeholder="Email" value="admin@sotutrasm.com">
+                <input type="password" id="auth-pass" class="w-full p-4 rounded-2xl bg-white border border-slate-200 outline-none focus:border-blue-500" placeholder="Mot de passe" value="admin123">
+                <button onclick="handleAuth()" class="w-full bg-slate-900 text-white py-4 rounded-2xl font-bold shadow-lg hover:bg-black btn-action">Se Connecter</button>
             </div>
         </div>
     </div>
 
-    <!-- Notification -->
-    <div id="notification" class="notification">
-        <i class="fas fa-check-circle"></i> <span id="notificationText">Opération réussie</span>
+    <div id="view-selection" class="hidden min-h-screen flex flex-col items-center justify-center p-6">
+        <h2 class="text-2xl font-bold mb-8 text-slate-800">Sélectionner l'Unité</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 w-full max-w-2xl">
+            <button onclick="initApp('Blue Shark')" class="premium-card p-10 hover:border-blue-500 hover:scale-[1.02] btn-action group">
+                <div class="w-16 h-16 bg-blue-100 rounded-2xl mx-auto flex items-center justify-center mb-4 group-hover:bg-blue-600 transition-colors">
+                    <i class="fas fa-water text-blue-600 group-hover:text-white text-2xl"></i>
+                </div>
+                <span class="text-xl font-extrabold text-slate-800">Blue Shark</span>
+            </button>
+            <button onclick="initApp('White Shark')" class="premium-card p-10 hover:border-blue-500 hover:scale-[1.02] btn-action group">
+                <div class="w-16 h-16 bg-slate-100 rounded-2xl mx-auto flex items-center justify-center mb-4 group-hover:bg-blue-600 transition-colors">
+                    <i class="fas fa-anchor text-slate-600 group-hover:text-white text-2xl"></i>
+                </div>
+                <span class="text-xl font-extrabold text-slate-800">White Shark</span>
+            </button>
+        </div>
+    </div>
+
+    <div id="view-main" class="hidden">
+        <header class="bg-white/80 backdrop-blur-md border-b border-slate-100 sticky top-0 z-50 p-4">
+            <div class="max-w-xl mx-auto flex justify-between items-center">
+                <div>
+                    <span id="active-drague-name" class="text-[10px] font-bold text-blue-600 uppercase tracking-[0.2em]">BLUE SHARK</span>
+                    <h1 class="text-xl font-black text-slate-900">Dashboard</h1>
+                </div>
+                <div id="global-timer" class="px-4 py-2 bg-red-50 text-red-600 rounded-full font-mono font-black border border-red-100">00:00:00</div>
+            </div>
+        </header>
+
+        <main class="p-4 max-w-xl mx-auto space-y-6">
+            
+            <div id="tab-ops-view" class="tab-pane space-y-6">
+                <div class="grid grid-cols-2 gap-4">
+                    <button onclick="startSession()" class="bg-green-500 text-white p-5 rounded-3xl font-bold shadow-lg shadow-green-100 btn-action"><i class="fas fa-play mr-2"></i>Démarrer</button>
+                    <button onclick="stopSession()" class="bg-white text-red-500 border border-red-100 p-5 rounded-3xl font-bold btn-action"><i class="fas fa-stop mr-2"></i>Arrêter</button>
+                </div>
+
+                <div class="premium-card p-6 space-y-4">
+                    <h3 class="font-bold text-slate-800">Saisie des Opérations</h3>
+                    <input type="text" id="op-chauffeur" class="w-full p-4 rounded-xl bg-slate-50 border border-slate-100" placeholder="Chauffeur">
+                    <div class="grid grid-cols-3 gap-3">
+                        <input type="number" id="op-long" class="p-4 rounded-xl bg-slate-50 border border-slate-100 text-center" placeholder="L">
+                        <input type="number" id="op-larg" class="p-4 rounded-xl bg-slate-50 border border-slate-100 text-center" placeholder="l">
+                        <input type="number" id="op-prof" class="p-4 rounded-xl bg-slate-50 border border-slate-100 text-center" placeholder="P">
+                    </div>
+                    <button onclick="saveOperation()" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-bold btn-action">Synchroniser Opération</button>
+                </div>
+            </div>
+
+            <div id="tab-moteurs-view" class="tab-pane hidden space-y-4">
+                <div id="engine-container" class="space-y-4">
+                    </div>
+            </div>
+
+            <div id="tab-fuel-view" class="tab-pane hidden space-y-4">
+                <div class="premium-card p-8 bg-slate-900 text-white text-center">
+                    <p class="text-xs text-slate-400 uppercase font-bold tracking-widest">Stock Carburant</p>
+                    <h2 class="text-5xl font-black mt-2">14,250 <small class="text-lg">L</small></h2>
+                </div>
+                <div class="premium-card p-6">
+                    <h3 class="font-bold mb-4">Ravitaillement</h3>
+                    <input type="number" class="w-full p-4 rounded-xl bg-slate-50 border border-slate-100 mb-4" placeholder="Quantité (L)">
+                    <button class="w-full bg-blue-600 text-white py-4 rounded-2xl font-bold btn-action">Ajouter au Stock</button>
+                </div>
+            </div>
+
+        </main>
+
+        <nav class="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-lg border-t border-slate-100 p-3 px-6 flex justify-between items-center z-50">
+            <button onclick="switchTab('ops')" id="btn-ops" class="p-3 px-5 rounded-2xl text-slate-400 font-bold flex flex-col items-center active-tab"><i class="fas fa-layer-group mb-1"></i><span class="text-[9px] uppercase">Ops</span></button>
+            <button onclick="switchTab('moteurs')" id="btn-moteurs" class="p-3 px-5 rounded-2xl text-slate-400 font-bold flex flex-col items-center"><i class="fas fa-engine mb-1"></i><span class="text-[9px] uppercase">Moteurs</span></button>
+            <button onclick="switchTab('fuel')" id="btn-fuel" class="p-3 px-5 rounded-2xl text-slate-400 font-bold flex flex-col items-center"><i class="fas fa-gas-pump mb-1"></i><span class="text-[9px] uppercase">Fuel</span></button>
+            <button onclick="location.reload()" class="p-3 px-5 rounded-2xl text-red-400 font-bold flex flex-col items-center"><i class="fas fa-power-off mb-1"></i><span class="text-[9px] uppercase">Quitter</span></button>
+        </nav>
     </div>
 
     <script>
-        // Application State - RESET TO DEFAULT ON PAGE LOAD
-        let state = {
-            currentDredge: null,
-            selectedDredge: null,
-            timer: {
-                running: false,
-                startTime: null,
-                elapsedTime: 0,
-                interval: null
-            },
-            operations: [], // RESET on page load
-            dailyData: {
-                hours: 0,
-                volume: 0,
-                fuel: 0
-            },
-            motors: {
-                'blue-shark': [
-                    { id: 1, name: 'CAT C32', hours: 1250, lastOilChange: 1150, issues: [] },
-                    { id: 2, name: 'CAT 3406', hours: 980, lastOilChange: 850, issues: [] },
-                    { id: 3, name: 'IVECO', hours: 2100, lastOilChange: 1950, issues: [] }
-                ],
-                'white-shark': [
-                    { id: 1, name: 'CAT 3512', hours: 3200, lastOilChange: 3050, issues: [] }
-                ]
-            },
-            fuel: {
-                current: 6500,
-                capacity: 10000,
-                history: [
-                    { date: '2024-01-15', type: 'refuel', amount: 2000, operator: 'Jean Dupont' },
-                    { date: '2024-01-14', type: 'consumption', amount: -350, operator: 'Blue Shark' },
-                    { date: '2024-01-12', type: 'refuel', amount: 1500, operator: 'Jean Dupont' }
-                ]
-            },
-            reports: [
-                { id: 1, type: 'weekly', period: '08-14 Jan 2024', date: '2024-01-15' },
-                { id: 2, type: 'monthly', period: 'Décembre 2023', date: '2024-01-01' },
-                { id: 3, type: 'weekly', period: '01-07 Jan 2024', date: '2024-01-08' }
-            ]
+        // FIREBASE CONFIG (Already provided by you)
+        const firebaseConfig = {
+            apiKey: "AIzaSyBJxyFwFseINtXqdEU0JYESl6zQYVj0hSw",
+            authDomain: "sotutrasm-manager.firebaseapp.com",
+            projectId: "sotutrasm-manager",
+            storageBucket: "sotutrasm-manager.firebasestorage.app",
+            messagingSenderId: "452756329466",
+            appId: "1:452756329466:web:8c5b54a2818e4602874a43"
         };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
 
-        // Variables for reset modal
-        let resetType = 'all'; // 'all', 'today', 'timer'
-        let pendingReset = false;
+        let currentUnit = "";
+        let timerInterval = null;
+        let seconds = 0;
 
-        // Initialize the application
-        document.addEventListener('DOMContentLoaded', function() {
-            // RESET timer on page load
-            resetTimer();
-            
-            // Load from localStorage (but ignore timer data)
-            const saved = localStorage.getItem('sotutrasm_data');
-            if (saved) {
-                const parsed = JSON.parse(saved);
-                
-                // Only load persistent data (not timer or daily data)
-                state.selectedDredge = parsed.selectedDredge;
-                state.operations = parsed.operations || [];
-                state.motors = parsed.motors || state.motors;
-                state.fuel = parsed.fuel || state.fuel;
-                state.reports = parsed.reports || state.reports;
-                
-                // Calculate daily data from today's operations
-                calculateDailyData();
-                
-                if (state.selectedDredge) {
-                    state.currentDredge = state.selectedDredge === 'blue-shark' ? 'Blue Shark' : 'White Shark';
-                    document.getElementById('currentDredge').innerHTML = `
-                        <strong>${state.currentDredge}</strong>
-                    `;
-                    document.getElementById('currentDredgeTitle').textContent = state.currentDredge;
-                    
-                    // Show main app if dredge is selected
-                    showMainApp();
-                }
-            }
-            
-            updateFuelDisplay();
-            loadReports();
-            updateDashboard();
-            
-            // Set up event listeners
-            document.getElementById('reportType').addEventListener('change', function() {
-                document.getElementById('customDateRange').style.display = 
-                    this.value === 'custom' ? 'block' : 'none';
-            });
-            
-            // Show notification if coming from refresh
-            if (performance.navigation.type === 1) { // Page was refreshed
-                setTimeout(() => {
-                    showNotification('Application rechargée - Données du jour réinitialisées', 'info');
-                }, 1000);
-            }
-        });
-
-        // Reset timer function
-        function resetTimer() {
-            if (state.timer.interval) {
-                clearInterval(state.timer.interval);
-            }
-            
-            state.timer = {
-                running: false,
-                startTime: null,
-                elapsedTime: 0,
-                interval: null
-            };
-            
-            document.getElementById('timerDisplay').textContent = '00:00:00';
-            document.getElementById('startBtn').style.display = 'flex';
-            document.getElementById('pauseBtn').style.display = 'none';
+        function handleAuth() {
+            document.getElementById('view-auth').classList.add('hidden');
+            document.getElementById('view-selection').classList.remove('hidden');
         }
 
-        // Clear timer (public function)
-        function clearTimer() {
-            resetTimer();
-            showNotification('Minuteur réinitialisé', 'success');
-            saveToLocalStorage();
+        function initApp(unit) {
+            currentUnit = unit;
+            document.getElementById('view-selection').classList.add('hidden');
+            document.getElementById('view-main').classList.remove('hidden');
+            document.getElementById('active-drague-name').innerText = unit;
+            renderEngines();
         }
 
-        // Calculate daily data from operations
-        function calculateDailyData() {
-            const today = new Date().toISOString().split('T')[0];
-            state.dailyData = { hours: 0, volume: 0, fuel: 0 };
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-pane').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`tab-${tab}-view`).classList.remove('hidden');
             
-            state.operations.forEach(op => {
-                const opDate = op.date.split('T')[0];
-                if (opDate === today) {
-                    if (op.duration) {
-                        state.dailyData.hours += op.duration.hours + (op.duration.minutes / 60);
-                    }
-                    if (op.volume) {
-                        state.dailyData.volume += op.volume;
-                    }
-                    if (op.fuelConsumed) {
-                        state.dailyData.fuel += op.fuelConsumed;
-                    }
-                }
-            });
+            // UI Toggle
+            document.querySelectorAll('nav button').forEach(el => el.classList.remove('active-tab'));
+            document.getElementById(`btn-${tab}`).classList.add('active-tab');
         }
 
-        // Dredge Selection
-        function selectDredge(dredgeType) {
-            state.selectedDredge = dredgeType;
-            state.currentDredge = dredgeType === 'blue-shark' ? 'Blue Shark' : 'White Shark';
+        function renderEngines() {
+            const container = document.getElementById('engine-container');
+            const engines = currentUnit === "Blue Shark" ? ["CAT C32", "CAT 3406", "IVECO"] : ["CAT 3512"];
             
-            document.getElementById('currentDredge').innerHTML = `
-                <strong>${state.currentDredge}</strong>
-            `;
-            document.getElementById('currentDredgeTitle').textContent = state.currentDredge;
-            
-            // Highlight selected dredge card
-            document.querySelectorAll('.dredge-card').forEach(card => {
-                card.classList.remove('selected');
-            });
-            event.currentTarget.classList.add('selected');
-            
-            // Load motors for selected dredge
-            loadMotors();
-            
-            // Show confirmation and switch to main app after delay
-            showNotification('Drague sélectionnée avec succès');
-            setTimeout(showMainApp, 1000);
+            container.innerHTML = engines.map(name => `
+                <div class="premium-card p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h4 class="font-extrabold text-slate-800">${name}</h4>
+                        <span class="text-[10px] bg-blue-50 text-blue-600 px-2 py-1 rounded-lg font-bold">ACTIF</span>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="flex justify-between text-xs font-bold">
+                            <span class="text-slate-400 uppercase">Prochaine Vidange</span>
+                            <span class="text-blue-600">180 / 250 H</span>
+                        </div>
+                        <div class="engine-progress">
+                            <div class="engine-progress-bar" style="width: 72%"></div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <input type="number" class="w-full p-3 rounded-xl bg-slate-50 border border-slate-100 text-sm" placeholder="Heures">
+                            <button class="bg-slate-100 text-slate-700 py-3 rounded-xl text-xs font-bold btn-action">Vidange Done</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
         }
 
-        // Switch between dredges
-        function switchDredge() {
-            if (!state.selectedDredge) return;
-            
-            // Toggle between blue-shark and white-shark
-            const newDredge = state.selectedDredge === 'blue-shark' ? 'white-shark' : 'blue-shark';
-            
-            // Save current state
-            saveToLocalStorage();
-            
-            // Reset timer when switching dredges
-            resetTimer();
-            
-            // Select new dredge
-            selectDredge(newDredge);
-            
-            // Update UI
-            document.getElementById('currentDredgeTitle').textContent = 
-                newDredge === 'blue-shark' ? 'Blue Shark' : 'White Shark';
-            
-            showNotification(`Passage à ${newDredge === 'blue-shark' ? 'Blue Shark' : 'White Shark'}`, 'info');
+        function startSession() {
+            if(timerInterval) return;
+            timerInterval = setInterval(() => {
+                seconds++;
+                let h = Math.floor(seconds/3600).toString().padStart(2,'0');
+                let m = Math.floor((seconds%3600)/60).toString().padStart(2,'0');
+                let s = (seconds%60).toString().padStart(2,'0');
+                document.getElementById('global-timer').innerText = `${h}:${m}:${s}`;
+            }, 1000);
         }
 
-        function showMainApp() {
-            document.getElementById('dredgeSelection').classList.remove('active');
-            document.getElementById('operationsScreen').classList.add('active');
-            saveToLocalStorage();
+        function stopSession() {
+            clearInterval(timerInterval);
+            timerInterval = null;
+            alert("Opération terminée et sauvegardée !");
         }
 
-        // Timer Functions
-        function startTimer() {
-            if (!state.timer.running) {
-                state.timer.running = true;
-                state.timer.startTime = Date.now() - state.timer.elapsedTime;
-                
-                state.timer.interval = setInterval(updateTimerDisplay, 1000);
-                
-                document.getElementById('startBtn').style.display = 'none';
-                document.getElementById('pauseBtn').style.display = 'flex';
-            }
-        }
-
-        function pauseTimer() {
-            if (state.timer.running) {
-                state.timer.running = false;
-                clearInterval(state.timer.interval);
-                
-                document.getElementById('startBtn').style.display = 'flex';
-                document.getElementById('pauseBtn').style.display = 'none';
-            }
-        }
-
-        function stopTimer() {
-            if (!state.timer.running && state.timer.elapsedTime === 0) {
-                showNotification('Le minuteur n\'a pas démarré', 'warning');
-                return;
-            }
-            
-            state.timer.running = false;
-            clearInterval(state.timer.interval);
-            
-            // Record the operation only if timer was running
-            if (state.timer.startTime) {
-                const duration = Date.now() - state.timer.startTime;
-                const hours = Math.floor(duration / 3600000);
-                const minutes = Math.floor((duration % 3600000) / 60000);
-                
-                state.operations.push({
-                    date: new Date().toISOString(),
-                    duration: { hours, minutes },
-                    dredge: state.currentDredge,
-                    driver: document.getElementById('driverName').value || 'Inconnu'
-                });
-                
-                // Update daily data
-                state.dailyData.hours += hours + (minutes / 60);
-                
-                updateDashboard();
-                saveToLocalStorage();
-                showNotification('Travail enregistré avec succès');
-            }
-            
-            // Reset timer
-            resetTimer();
-        }
-
-        function updateTimerDisplay() {
-            if (state.timer.running) {
-                const elapsed = Date.now() - state.timer.startTime;
-                state.timer.elapsedTime = elapsed;
-                
-                const hours = Math.floor(elapsed / 3600000).toString().padStart(2, '0');
-                const minutes = Math.floor((elapsed % 3600000) / 60000).toString().padStart(2, '0');
-                const seconds = Math.floor((elapsed % 60000) / 1000).toString().padStart(2, '0');
-                
-                document.getElementById('timerDisplay').textContent = `${hours}:${minutes}:${seconds}`;
-            }
-        }
-
-        // Operations Functions
         function saveOperation() {
-            const length = parseFloat(document.getElementById('length').value) || 0;
-            const width = parseFloat(document.getElementById('width').value) || 0;
-            const depth = parseFloat(document.getElementById('depth').value) || 0;
-            const fuel = parseFloat(document.getElementById('fuelConsumed').value) || 0;
-            
-            if (length === 0 || width === 0 || depth === 0) {
-                showNotification('Veuillez remplir les dimensions', 'warning');
-                return;
-            }
-            
-            const volume = (length * width * depth).toFixed(2);
-            
-            // Update fuel
-            if (fuel > 0) {
-                state.fuel.current -= fuel;
-                state.fuel.history.unshift({
-                    date: new Date().toISOString().split('T')[0],
-                    type: 'consumption',
-                    amount: -fuel,
-                    operator: document.getElementById('driverName').value || 'Inconnu'
-                });
-                updateFuelDisplay();
-                
-                // Update daily fuel
-                state.dailyData.fuel += fuel;
-            }
-            
-            // Update daily volume
-            state.dailyData.volume += parseFloat(volume);
-            
-            // Add to operations
-            state.operations.push({
-                date: new Date().toISOString(),
-                dimensions: { length, width, depth },
-                volume: parseFloat(volume),
-                fuelConsumed: fuel,
-                driver: document.getElementById('driverName').value,
-                team: document.getElementById('teamMembers').value
-            });
-            
-            // Clear form
-            document.getElementById('length').value = '';
-            document.getElementById('width').value = '';
-            document.getElementById('depth').value = '';
-            document.getElementById('fuelConsumed').value = '';
-            
-            updateDashboard();
-            saveToLocalStorage();
-            showNotification('Opération enregistrée avec succès');
-        }
-
-        // Reset Data Functions
-        function resetAllData() {
-            resetType = 'all';
-            document.getElementById('resetModalTitle').textContent = 'Réinitialiser toutes les données';
-            document.getElementById('resetModalText').textContent = 
-                'Êtes-vous sûr de vouloir réinitialiser TOUTES les données ? Cette action supprimera toutes les opérations, l\'historique carburant et les rapports. Cette action est irréversible.';
-            document.getElementById('resetModal').style.display = 'flex';
-        }
-
-        function resetTodayData() {
-            resetType = 'today';
-            document.getElementById('resetModalTitle').textContent = 'Réinitialiser les données du jour';
-            document.getElementById('resetModalText').textContent = 
-                'Êtes-vous sûr de vouloir réinitialiser les données du jour ? Cette action supprimera toutes les opérations d\'aujourd\'hui et réinitialisera le minuteur.';
-            document.getElementById('resetModal').style.display = 'flex';
-        }
-
-        function closeResetModal() {
-            document.getElementById('resetModal').style.display = 'none';
-        }
-
-        function confirmReset() {
-            closeResetModal();
-            
-            switch(resetType) {
-                case 'all':
-                    // Reset everything except default motor hours
-                    state.operations = [];
-                    state.dailyData = { hours: 0, volume: 0, fuel: 0 };
-                    state.fuel = {
-                        current: 6500,
-                        capacity: 10000,
-                        history: []
-                    };
-                    state.reports = [];
-                    resetTimer();
-                    
-                    // Reset motor hours to defaults
-                    state.motors = {
-                        'blue-shark': [
-                            { id: 1, name: 'CAT C32', hours: 1250, lastOilChange: 1150, issues: [] },
-                            { id: 2, name: 'CAT 3406', hours: 980, lastOilChange: 850, issues: [] },
-                            { id: 3, name: 'IVECO', hours: 2100, lastOilChange: 1950, issues: [] }
-                        ],
-                        'white-shark': [
-                            { id: 1, name: 'CAT 3512', hours: 3200, lastOilChange: 3050, issues: [] }
-                        ]
-                    };
-                    
-                    showNotification('Toutes les données ont été réinitialisées', 'success');
-                    break;
-                    
-                case 'today':
-                    // Remove today's operations
-                    const today = new Date().toISOString().split('T')[0];
-                    state.operations = state.operations.filter(op => {
-                        const opDate = op.date.split('T')[0];
-                        return opDate !== today;
-                    });
-                    
-                    // Reset daily data
-                    state.dailyData = { hours: 0, volume: 0, fuel: 0 };
-                    resetTimer();
-                    showNotification('Données du jour réinitialisées', 'success');
-                    break;
-                    
-                case 'timer':
-                    resetTimer();
-                    showNotification('Minuteur réinitialisé', 'success');
-                    break;
-            }
-            
-            updateDashboard();
-            updateFuelDisplay();
-            loadReports();
-            if (state.selectedDredge) {
-                loadMotors();
-            }
-            saveToLocalStorage();
-        }
-
-        // Motors Functions (same as before)
-        function loadMotors() {
-            const container = document.getElementById('motorsContainer');
-            const motors = state.motors[state.selectedDredge];
-            
-            let html = '<h3 class="card-title"><i class="fas fa-cogs"></i> Suivi des moteurs</h3>';
-            
-            motors.forEach(motor => {
-                const hoursToNextOil = 250 - (motor.hours - motor.lastOilChange);
-                const oilChangeNeeded = hoursToNextOil <= 0;
-                
-                html += `
-                    <div class="motor-section">
-                        <div class="motor-card card">
-                            <div class="motor-info">
-                                <div class="motor-name">${motor.name}</div>
-                                <div class="motor-hours">${motor.hours} h</div>
-                            </div>
-                            
-                            <div class="mb-3">
-                                <strong>Prochaine vidange:</strong> 
-                                <span class="${oilChangeNeeded ? 'text-danger' : 'text-success'}">
-                                    ${motor.lastOilChange + 250} h
-                                </span>
-                                <small class="text-dark-gray"> (dans ${hoursToNextOil} heures)</small>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label class="form-label">Ajouter des heures</label>
-                                <input type="number" class="form-input add-hours" 
-                                       data-motor-id="${motor.id}"
-                                       placeholder="Heures travaillées"
-                                       min="0" step="0.5">
-                            </div>
-                            
-                            <button class="btn ${oilChangeNeeded ? 'btn-danger' : 'btn-outline'}" 
-                                    onclick="performOilChange(${motor.id})">
-                                <i class="fas fa-oil-can"></i> Vidange effectuée
-                            </button>
-                            
-                            ${motor.issues.length > 0 ? `
-                                <div class="mt-3">
-                                    <strong>Anomalies signalées:</strong>
-                                    <ul class="mt-1" style="padding-left: 20px;">
-                                        ${motor.issues.map(issue => `<li>${issue}</li>`).join('')}
-                                    </ul>
-                                </div>
-                            ` : ''}
-                        </div>
-                    </div>
-                `;
-            });
-            
-            container.innerHTML = html;
-            
-            // Add event listeners for hour inputs
-            document.querySelectorAll('.add-hours').forEach(input => {
-                input.addEventListener('change', function() {
-                    const hours = parseFloat(this.value) || 0;
-                    const motorId = parseInt(this.dataset.motorId);
-                    if (hours > 0) {
-                        addMotorHours(motorId, hours);
-                        this.value = '';
-                    }
-                });
-            });
-        }
-
-        function addMotorHours(motorId, hours) {
-            const motors = state.motors[state.selectedDredge];
-            const motor = motors.find(m => m.id === motorId);
-            
-            if (motor) {
-                motor.hours += hours;
-                showNotification(`${hours} heures ajoutées au moteur ${motor.name}`);
-                loadMotors();
-                saveToLocalStorage();
-            }
-        }
-
-        function performOilChange(motorId) {
-            const motors = state.motors[state.selectedDredge];
-            const motor = motors.find(m => m.id === motorId);
-            
-            if (motor) {
-                motor.lastOilChange = motor.hours;
-                showNotification(`Vidange enregistrée pour ${motor.name}`);
-                loadMotors();
-                saveToLocalStorage();
-            }
-        }
-
-        function reportIssue() {
-            const description = document.getElementById('issueDescription').value.trim();
-            
-            if (!description) {
-                showNotification('Veuillez décrire le problème', 'warning');
-                return;
-            }
-            
-            // For simplicity, add to first motor
-            if (state.motors[state.selectedDredge].length > 0) {
-                state.motors[state.selectedDredge][0].issues.push(
-                    `${new Date().toLocaleDateString()}: ${description}`
-                );
-            }
-            
-            document.getElementById('issueDescription').value = '';
-            loadMotors();
-            showNotification('Anomalie signalée avec succès');
-            saveToLocalStorage();
-        }
-
-        // Fuel Functions (same as before)
-        function updateFuelDisplay() {
-            const percentage = Math.round((state.fuel.current / state.fuel.capacity) * 100);
-            
-            document.getElementById('fuelFill').style.width = `${percentage}%`;
-            document.getElementById('fuelPercentage').textContent = `${percentage}%`;
-            document.getElementById('fuelAmount').textContent = `${state.fuel.current.toLocaleString()} L`;
-            
-            loadFuelHistory();
-        }
-
-        function addFuel() {
-            const amount = parseFloat(document.getElementById('refuelAmount').value) || 0;
-            
-            if (amount <= 0) {
-                showNotification('Veuillez entrer une quantité valide', 'warning');
-                return;
-            }
-            
-            if (state.fuel.current + amount > state.fuel.capacity) {
-                showNotification('Capacité maximale dépassée', 'warning');
-                return;
-            }
-            
-            state.fuel.current += amount;
-            state.fuel.history.unshift({
-                date: new Date().toISOString().split('T')[0],
-                type: 'refuel',
-                amount: amount,
-                operator: document.getElementById('driverName').value || 'Inconnu'
-            });
-            
-            document.getElementById('refuelAmount').value = '';
-            updateFuelDisplay();
-            saveToLocalStorage();
-            showNotification(`${amount} L ajoutés au stock`);
-        }
-
-        function loadFuelHistory() {
-            const container = document.getElementById('fuelHistory');
-            let html = '';
-            
-            state.fuel.history.slice(0, 10).forEach(entry => {
-                const icon = entry.type === 'refuel' ? 'fa-plus-circle text-success' : 'fa-minus-circle text-danger';
-                const sign = entry.type === 'refuel' ? '+' : '';
-                
-                html += `
-                    <div class="report-item">
-                        <div class="report-info">
-                            <h4>${entry.operator}</h4>
-                            <div class="report-date">${entry.date}</div>
-                        </div>
-                        <div>
-                            <i class="fas ${icon}"></i>
-                            <strong>${sign}${entry.amount} L</strong>
-                        </div>
-                    </div>
-                `;
-            });
-            
-            container.innerHTML = html || '<p class="text-center text-dark-gray">Aucun historique disponible</p>';
-        }
-
-        // Reports Functions (same as before)
-        function loadReports() {
-            const container = document.getElementById('reportsList');
-            let html = '';
-            
-            state.reports.forEach(report => {
-                const icon = report.type === 'weekly' ? 'fa-calendar-week' : 'fa-calendar-alt';
-                const typeText = report.type === 'weekly' ? 'Hebdomadaire' : 'Mensuel';
-                
-                html += `
-                    <div class="report-item">
-                        <div class="report-info">
-                            <h4>Rapport ${typeText}</h4>
-                            <div class="report-date">${report.period} • Généré le ${report.date}</div>
-                        </div>
-                        <div>
-                            <button class="btn btn-outline btn-sm" onclick="viewReport(${report.id})">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                            <button class="btn btn-primary btn-sm" onclick="downloadReport(${report.id})">
-                                <i class="fas fa-download"></i>
-                            </button>
-                        </div>
-                    </div>
-                `;
-            });
-            
-            container.innerHTML = html || '<p class="text-center text-dark-gray">Aucun rapport disponible</p>';
-        }
-
-        function generateReport() {
-            const type = document.getElementById('reportType').value;
-            
-            // Create a new report
-            const today = new Date();
-            let period = '';
-            
-            if (type === 'weekly') {
-                const startDate = new Date(today);
-                startDate.setDate(today.getDate() - 7);
-                period = `${startDate.toLocaleDateString()} - ${today.toLocaleDateString()}`;
-            } else if (type === 'monthly') {
-                period = today.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
-            } else {
-                const start = document.getElementById('startDate').value;
-                const end = document.getElementById('endDate').value;
-                period = `${start} - ${end}`;
-            }
-            
-            const newReport = {
-                id: state.reports.length + 1,
-                type: type,
-                period: period,
-                date: today.toISOString().split('T')[0]
-            };
-            
-            state.reports.unshift(newReport);
-            loadReports();
-            saveToLocalStorage();
-            showNotification('Rapport généré avec succès');
-        }
-
-        function viewReport(reportId) {
-            const report = state.reports.find(r => r.id === reportId);
-            if (report) {
-                alert(`Vue du rapport ${report.type} pour la période ${report.period}`);
-            }
-        }
-
-        function downloadReport(reportId) {
-            showNotification('Rapport téléchargé (simulation)');
-        }
-
-        function exportPDF() {
-            showNotification('PDF généré avec succès (simulation)');
-        }
-
-        // Dashboard Functions
-        function updateDashboard() {
-            // Use daily data for display
-            document.getElementById('totalHours').textContent = 
-                `${Math.floor(state.dailyData.hours)}h${Math.round((state.dailyData.hours % 1) * 60)}`;
-            
-            document.getElementById('totalVolume').textContent = 
-                `${state.dailyData.volume.toFixed(1)} m³`;
-            
-            document.getElementById('totalFuel').textContent = 
-                `${state.dailyData.fuel.toFixed(0)} L`;
-            
-            const efficiency = state.dailyData.volume > 0 ? 
-                (state.dailyData.fuel / state.dailyData.volume).toFixed(1) : 0;
-            document.getElementById('efficiency').textContent = 
-                `${efficiency} L/m³`;
-        }
-
-        // Navigation
-        function showTab(tabName) {
-            // Update active tab
-            document.querySelectorAll('.nav-tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            event.currentTarget.classList.add('active');
-            
-            // Hide all screens
-            document.querySelectorAll('.screen').forEach(screen => {
-                screen.classList.remove('active');
-            });
-            
-            // Show selected screen
-            document.getElementById(`${tabName}Screen`).classList.add('active');
-            
-            // Update data if needed
-            if (tabName === 'motors') {
-                loadMotors();
-            } else if (tabName === 'fuel') {
-                updateFuelDisplay();
-            } else if (tabName === 'reports') {
-                loadReports();
-            }
-        }
-
-        // Notification System
-        function showNotification(message, type = 'success') {
-            const notification = document.getElementById('notification');
-            const text = document.getElementById('notificationText');
-            
-            // Set color based on type
-            notification.style.backgroundColor = 
-                type === 'success' ? '#10b981' : 
-                type === 'warning' ? '#f59e0b' : 
-                type === 'info' ? '#3b82f6' : '#ef4444';
-            
-            text.textContent = message;
-            notification.classList.add('show');
-            
-            setTimeout(() => {
-                notification.classList.remove('show');
-            }, 3000);
-        }
-
-        // Local Storage
-        function saveToLocalStorage() {
-            // Don't save timer state
-            const saveState = {
-                ...state,
-                timer: {
-                    running: false,
-                    startTime: null,
-                    elapsedTime: 0,
-                    interval: null
-                }
-            };
-            localStorage.setItem('sotutrasm_data', JSON.stringify(saveState));
+            const v = document.getElementById('op-long').value;
+            if(!v) return alert("Veuillez saisir les données");
+            alert("Données synchronisées avec succès !");
         }
     </script>
 </body>
