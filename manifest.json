@@ -1,7 +1,7 @@
 {
   "name": "SOTUTRASM - Suivi Dredging",
   "short_name": "SOTUTRASM",
-  "description": "Application de suivi des opérations de dragage",
+  "description": "Application de suivi des opérations de dragage avec synchronisation cloud",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#2563eb",
