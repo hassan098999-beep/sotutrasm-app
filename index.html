@@ -8,118 +8,139 @@
     
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
-    
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
         body { font-family: 'Poppins', sans-serif; background-color: #0f172a; color: #e2e8f0; }
-        .glass-panel { background: rgba(30, 41, 59, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(51, 65, 85, 0.5); }
-        .input-field { width: 100%; padding: 12px; border-radius: 10px; background: #1e293b; border: 1px solid #334155; color: white; margin-bottom: 15px; }
+        .glass-card { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 24px; }
+        .smart-input { width: 100%; padding: 14px; border-radius: 12px; background: #0f172a; border: 1px solid #334155; color: white; transition: 0.3s; }
+        .smart-input:focus { border-color: #3b82f6; box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2); outline: none; }
+        .btn-gradient { background: linear-gradient(135deg, #2563eb, #1d4ed8); transition: all 0.3s; }
+        .btn-gradient:active { transform: scale(0.96); }
     </style>
 </head>
-<body class="min-h-screen">
+<body class="min-h-screen pb-20">
 
-    <div id="view-login" class="min-h-screen flex flex-col items-center justify-center p-6">
-        <div class="glass-panel rounded-3xl p-8 w-full max-w-md shadow-2xl">
-            <h1 class="text-3xl font-black text-white text-center mb-6">SOTUTRASM</h1>
-            <p class="text-blue-400 text-center text-sm mb-8 uppercase font-bold">Connexion Cloud</p>
+    <nav class="p-4 flex justify-between items-center sticky top-0 z-50 bg-[#0f172a]/80 backdrop-blur-md">
+        <div class="flex items-center gap-2">
+            <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center font-black text-white">S</div>
+            <span class="font-bold tracking-tight text-xl">SOTUTRASM</span>
+        </div>
+        <button onclick="location.reload()" class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-red-400">
+            <i class="fas fa-power-off"></i>
+        </button>
+    </nav>
+
+    <main class="p-4 space-y-6">
+        
+        <div class="glass-card p-6 shadow-2xl">
+            <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
+                <i class="fas fa-plus-circle text-blue-500"></i>
+                Nouveau Rapport Cloud
+            </h2>
             
-            <input type="email" id="email" class="input-field" placeholder="Email" value="admin@sotutrasm.com">
-            <input type="password" id="pass" class="input-field" placeholder="Mot de passe" value="admin123">
-            <button onclick="login()" class="w-full bg-blue-600 py-4 rounded-xl font-bold shadow-lg hover:bg-blue-700 transition">Se Connecter</button>
-        </div>
-    </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="text-xs text-slate-500 mb-1 block ml-1">Volume de Production (m³)</label>
+                    <input type="number" id="volume" class="smart-input" placeholder="0.00">
+                </div>
+                
+                <div>
+                    <label class="text-xs text-slate-500 mb-1 block ml-1">Consommation Gasoil (L)</label>
+                    <input type="number" id="gasoil" class="smart-input" placeholder="0.00">
+                </div>
 
-    <div id="view-main" class="hidden p-4 space-y-6">
-        <nav class="flex justify-between items-center bg-slate-800 p-4 rounded-2xl">
-            <span class="font-bold text-blue-400">SOTUTRASM Manager</span>
-            <button onclick="location.reload()" class="text-red-400 text-xs uppercase font-bold">Déconnexion</button>
-        </nav>
-
-        <div class="glass-panel p-6 rounded-2xl">
-            <h3 class="font-bold mb-4"><i class="fas fa-cloud-upload-alt mr-2"></i> Nouveau Rapport</h3>
-            <label class="text-xs text-slate-400">Volume de production (m³)</label>
-            <input type="number" id="volume" class="input-field mt-2" placeholder="Ex: 120">
-            <button onclick="syncToFirebase()" id="btn-sync" class="w-full bg-emerald-600 py-4 rounded-xl font-bold shadow-lg hover:bg-emerald-700 transition">
-                Synchroniser avec le Cloud
-            </button>
-        </div>
-
-        <div class="glass-panel p-4 rounded-2xl">
-            <h3 class="font-bold mb-4 text-sm uppercase text-slate-400">Données Synchronisées</h3>
-            <div id="data-list" class="space-y-2 text-sm text-slate-300">
-                Chargement des données...
+                <button onclick="saveData()" id="btn-sync" class="btn-gradient w-full py-4 rounded-xl font-bold shadow-lg shadow-blue-900/40 flex items-center justify-center gap-2">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    Synchroniser au Cloud
+                </button>
             </div>
         </div>
-    </div>
+
+        <div class="grid grid-cols-2 gap-4">
+            <div class="glass-card p-4 border-l-4 border-blue-500">
+                <p class="text-[10px] uppercase font-bold text-slate-500">Total Volume</p>
+                <div id="total-vol" class="text-xl font-black text-white">0 <small class="text-xs font-normal">m³</small></div>
+            </div>
+            <div class="glass-card p-4 border-l-4 border-emerald-500">
+                <p class="text-[10px] uppercase font-bold text-slate-500">Total Gasoil</p>
+                <div id="total-gas" class="text-xl font-black text-white">0 <small class="text-xs font-normal">L</small></div>
+            </div>
+        </div>
+
+        <div>
+            <h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4 ml-2">Historique des données</h3>
+            <div id="data-list" class="space-y-3">
+                </div>
+        </div>
+
+    </main>
 
     <script>
-        // إعداداتك التي أرسلتها
+        // إعدادات Firebase الخاصة بك
         const firebaseConfig = {
             apiKey: "AIzaSyBJxyFwFseINtXqdEU0JYESl6zQYVj0hSw",
             authDomain: "sotutrasm-manager.firebaseapp.com",
             projectId: "sotutrasm-manager",
             storageBucket: "sotutrasm-manager.firebasestorage.app",
             messagingSenderId: "452756329466",
-            appId: "1:452756329466:web:8c5b54a2818e4602874a43",
-            measurementId: "G-GGQC6EDSZB"
+            appId: "1:452756329466:web:8c5b54a2818e4602874a43"
         };
 
-        // تفعيل Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        function login() {
-            document.getElementById('view-login').classList.add('hidden');
-            document.getElementById('view-main').classList.remove('hidden');
-            loadData(); // جلب البيانات عند الدخول
-        }
-
-        // إرسال البيانات للسحابة
-        function syncToFirebase() {
+        function saveData() {
             const vol = document.getElementById('volume').value;
+            const gas = document.getElementById('gasoil').value;
             const btn = document.getElementById('btn-sync');
-            
-            if(!vol) return alert("Veuillez entrer une valeur");
+
+            if(!vol || !gas) return alert("Veuillez remplir tous les champs");
 
             btn.disabled = true;
-            btn.innerHTML = "En cours...";
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Envoi...';
 
             db.collection("reports").add({
-                volume: vol,
-                date: new Date().toLocaleString('fr-FR'),
-                timestamp: firebase.firestore.FieldValue.serverTimestamp()
-            })
-            .then(() => {
-                alert("Données sauvegardées sur le Cloud !");
+                volume: parseFloat(vol),
+                gasoil: parseFloat(gas),
+                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                date: new Date().toLocaleString('fr-FR', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' })
+            }).then(() => {
                 document.getElementById('volume').value = "";
+                document.getElementById('gasoil').value = "";
                 btn.disabled = false;
-                btn.innerHTML = "Synchroniser avec le Cloud";
-            })
-            .catch(err => {
-                alert("Erreur: " + err.message);
-                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Synchroniser au Cloud';
             });
         }
 
-        // جلب البيانات من السحابة وعرضها
-        function loadData() {
-            db.collection("reports").orderBy("timestamp", "desc").onSnapshot((snapshot) => {
-                const list = document.getElementById('data-list');
-                list.innerHTML = "";
-                snapshot.forEach((doc) => {
-                    const data = doc.data();
-                    list.innerHTML += `
-                        <div class="bg-slate-900/50 p-3 rounded-lg border border-slate-700 flex justify-between items-center">
-                            <span><strong class="text-emerald-400">${data.volume}</strong> m³</span>
-                            <span class="text-[10px] text-slate-500">${data.date}</span>
+        // جلب البيانات وتحديث الإحصائيات
+        db.collection("reports").orderBy("timestamp", "desc").onSnapshot(snapshot => {
+            const list = document.getElementById('data-list');
+            let totalV = 0;
+            let totalG = 0;
+            list.innerHTML = "";
+            
+            snapshot.forEach(doc => {
+                const d = doc.data();
+                totalV += d.volume || 0;
+                totalG += d.gasoil || 0;
+                
+                list.innerHTML += `
+                    <div class="glass-card p-4 flex justify-between items-center border border-slate-700/30">
+                        <div class="flex flex-col">
+                            <span class="text-blue-400 font-bold text-lg">${d.volume} m³</span>
+                            <span class="text-emerald-400 text-xs font-semibold">${d.gasoil} L Gasoil</span>
                         </div>
-                    `;
-                });
+                        <div class="text-right text-[10px] text-slate-500 font-mono">${d.date}</div>
+                    </div>
+                `;
             });
-        }
+            
+            document.getElementById('total-vol').innerHTML = `${totalV.toFixed(1)} <small class="text-xs">m³</small>`;
+            document.getElementById('total-gas').innerHTML = `${totalG.toFixed(1)} <small class="text-xs">L</small>`;
+        });
     </script>
 </body>
 </html>
