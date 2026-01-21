@@ -8,10 +8,9 @@
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
         
         * {
             margin: 0;
@@ -21,210 +20,140 @@
         
         body { 
             font-family: 'Poppins', sans-serif; 
-            background-color: #0f172a; 
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
             color: #e2e8f0;
-            overflow-x: hidden;
             min-height: 100vh;
         }
         
-        .glass-panel { 
-            background: rgba(30, 41, 59, 0.9); 
-            backdrop-filter: blur(12px); 
-            border: 1px solid rgba(51, 65, 85, 0.5);
+        /* Panel Design */
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 20px;
             transition: all 0.3s ease;
         }
         
-        .glass-panel:hover {
-            border-color: rgba(59, 130, 246, 0.5);
-        }
-        
-        .smart-input { 
-            width: 100%; 
-            padding: 12px; 
-            border-radius: 10px; 
-            border: 2px solid #334155; 
-            background: #1e293b; 
-            color: white; 
-            outline: none; 
-            transition: all 0.3s;
-            font-family: 'Poppins', sans-serif;
-        }
-        
-        .smart-input:focus { 
-            border-color: #3b82f6; 
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-        }
-        
-        /* Logo Design */
-        .logo-container { 
-            position: relative; 
-            width: 80px; 
-            height: 80px; 
-            margin: 0 auto; 
-        }
-        
-        .logo-shape-t-top { 
-            position: absolute; 
-            top: 10px; 
-            left: 5px; 
-            right: 10px; 
-            height: 20px; 
-            background: linear-gradient(135deg, #dc2626, #b91c1c); 
-            transform: skewX(-10deg); 
-            border-radius: 4px;
-            box-shadow: 0 4px 6px rgba(220, 38, 38, 0.3);
-        }
-        
-        .logo-shape-t-stem { 
-            position: absolute; 
-            top: 15px; 
-            left: 35px; 
-            width: 20px; 
-            height: 50px; 
-            background: linear-gradient(to bottom, #1d4ed8, #1e40af); 
-            transform: skewX(-10deg); 
-            border-radius: 4px;
-            box-shadow: 0 4px 6px rgba(29, 78, 216, 0.3);
-        }
-        
-        /* Animations */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .fade-in {
-            animation: fadeIn 0.5s ease-out;
-        }
-        
-        /* Table styles */
-        .data-table {
+        /* Input Design */
+        .smart-input {
             width: 100%;
-            border-collapse: collapse;
-        }
-        
-        .data-table th {
-            background: rgba(30, 41, 59, 0.8);
             padding: 12px 16px;
-            text-align: left;
-            font-weight: 600;
-            border-bottom: 2px solid #334155;
-            white-space: nowrap;
+            border-radius: 10px;
+            border: 2px solid #334155;
+            background: #1e293b;
+            color: white;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s;
         }
         
-        .data-table td {
-            padding: 12px 16px;
-            border-bottom: 1px solid #334155;
+        .smart-input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
         }
         
-        .data-table tr:hover {
-            background: rgba(51, 65, 85, 0.2);
-        }
-        
-        /* Status badges */
-        .status-badge {
+        /* Logo */
+        .logo {
             display: inline-flex;
             align-items: center;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            white-space: nowrap;
-        }
-        
-        .status-active { background: rgba(34, 197, 94, 0.2); color: #4ade80; }
-        .status-pending { background: rgba(251, 191, 36, 0.2); color: #fbbf24; }
-        .status-inactive { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
-        
-        /* Modal */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.7);
-            display: none;
             justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            padding: 20px;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #dc2626 0%, #1d4ed8 100%);
+            border-radius: 12px;
+            margin-bottom: 10px;
         }
         
-        .modal-content {
-            background: #1e293b;
-            border-radius: 16px;
-            padding: 20px;
-            width: 100%;
-            max-width: 500px;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-        
-        /* Loading spinner */
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid rgba(59, 130, 246, 0.1);
-            border-left-color: #3b82f6;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
-        /* Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: #1e293b;
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: #475569;
-            border-radius: 4px;
-        }
-        
-        ::-webkit-scrollbar-thumb:hover {
-            background: #64748b;
-        }
-        
-        /* Utility Classes */
-        .hidden {
-            display: none !important;
-        }
-        
-        .active {
-            display: block !important;
-        }
-        
-        .sidebar-item {
+        /* Button Styles */
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+            border: none;
+            padding: 14px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
             display: flex;
             align-items: center;
-            gap: 12px;
-            padding: 12px;
-            border-radius: 10px;
-            color: #cbd5e1;
-            text-decoration: none;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+        }
+        
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-weight: 500;
+            cursor: pointer;
             transition: all 0.3s;
-            margin-bottom: 4px;
         }
         
-        .sidebar-item:hover {
-            background: rgba(59, 130, 246, 0.1);
-            color: #ffffff;
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
         }
         
-        .sidebar-item.active {
-            background: rgba(59, 130, 246, 0.2);
-            color: #60a5fa;
+        /* Card Styles */
+        .stat-card {
+            background: rgba(30, 41, 59, 0.8);
+            border-radius: 16px;
+            padding: 20px;
+            border-left: 4px solid #3b82f6;
         }
         
+        .stat-card h3 {
+            font-size: 28px;
+            font-weight: 700;
+            margin: 5px 0;
+        }
+        
+        .stat-card p {
+            color: #94a3b8;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        /* Tab Navigation */
+        .tabs {
+            display: flex;
+            gap: 5px;
+            background: rgba(30, 41, 59, 0.8);
+            padding: 5px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+            color: #94a3b8;
+        }
+        
+        .tab.active {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        /* Hide/Show Views */
         .view {
             display: none;
         }
@@ -233,1188 +162,552 @@
             display: block;
         }
         
-        /* Mobile Optimizations */
+        /* Mobile Responsive */
         @media (max-width: 768px) {
-            .glass-panel {
-                padding: 16px !important;
+            .container {
+                padding: 15px;
             }
             
-            .modal-content {
-                padding: 16px;
-                margin: 10px;
+            .stat-card h3 {
+                font-size: 24px;
             }
             
-            .data-table {
-                display: block;
+            .tabs {
                 overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
             }
             
-            .smart-input {
-                padding: 10px;
-                font-size: 16px; /* Prevents zoom on iOS */
-            }
-            
-            .logo-container {
-                width: 60px;
-                height: 60px;
-            }
-            
-            .logo-shape-t-top {
-                top: 8px;
-                height: 16px;
-            }
-            
-            .logo-shape-t-stem {
-                top: 12px;
-                left: 25px;
-                width: 16px;
-                height: 40px;
+            .tab {
+                white-space: nowrap;
+                min-width: 100px;
             }
         }
         
-        /* Print Styles */
-        @media print {
-            .glass-panel {
-                background: white !important;
-                color: black !important;
-                border: 1px solid #ddd !important;
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
             }
-            
-            .no-print {
-                display: none !important;
+            to {
+                opacity: 1;
+                transform: translateY(0);
             }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(30, 41, 59, 0.5);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #3b82f6;
+            border-radius: 3px;
         }
     </style>
 </head>
-<body class="min-h-screen">
-    <!-- Login View -->
-    <div id="view-login" class="min-h-screen flex flex-col items-center justify-center p-4 bg-gradient-to-br from-slate-900 to-slate-800">
-        <div class="glass-panel rounded-3xl p-6 w-full max-w-md shadow-2xl fade-in">
-            <div class="text-center mb-6">
-                <div class="logo-container mb-4">
-                    <div class="logo-shape-t-top"></div>
-                    <div class="logo-shape-t-stem"></div>
+<body>
+    <!-- Login Screen -->
+    <div id="login-screen" class="min-h-screen flex items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-md">
+            <div class="text-center mb-8">
+                <div class="logo mx-auto">
+                    <i class="fas fa-cog text-white text-xl"></i>
                 </div>
-                <h1 class="text-2xl font-black text-white tracking-tight">SOTUTRASM</h1>
-                <p class="text-blue-400 font-bold text-xs uppercase tracking-widest mt-1">Smart Manager V8.0</p>
+                <h1 class="text-2xl font-bold text-white mt-3">SOTUTRASM</h1>
+                <p class="text-blue-400 text-sm font-medium mt-1">Smart Manager V8.0</p>
             </div>
-
-            <div class="space-y-4">
+            
+            <div class="space-y-5">
                 <div>
-                    <label class="text-sm font-bold text-slate-400 mb-2 block">Email Address</label>
-                    <input type="email" id="login-email" class="smart-input" value="admin@sotutrasm.com" placeholder="Enter your email">
+                    <label class="block text-sm font-medium text-slate-300 mb-2">
+                        <i class="fas fa-envelope mr-2"></i>Email
+                    </label>
+                    <input type="email" id="email" class="smart-input" placeholder="votre@email.com" value="admin@sotutrasm.com">
                 </div>
+                
                 <div>
-                    <label class="text-sm font-bold text-slate-400 mb-2 block">Password</label>
-                    <input type="password" id="login-password" class="smart-input" value="admin123" placeholder="Enter your password">
+                    <label class="block text-sm font-medium text-slate-300 mb-2">
+                        <i class="fas fa-lock mr-2"></i>Mot de passe
+                    </label>
+                    <input type="password" id="password" class="smart-input" placeholder="••••••••" value="admin123">
                 </div>
-                <button onclick="handleLogin()" class="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-3 rounded-xl font-bold transition-all duration-300 shadow-lg flex items-center justify-center gap-2 active:scale-95">
-                    <i class="fas fa-sign-in-alt"></i> Se Connecter
+                
+                <button onclick="login()" class="btn-primary">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Se Connecter
                 </button>
             </div>
             
             <div class="mt-6 text-center text-xs text-slate-400">
-                <p>Version 8.0 • Système de Gestion Intelligent</p>
+                <p>Système de Gestion Intelligent</p>
             </div>
         </div>
     </div>
-
-    <!-- Main Application -->
+    
+    <!-- Main App -->
     <div id="app" class="hidden min-h-screen">
         <!-- Header -->
-        <header class="glass-panel sticky top-0 z-40 p-4 flex justify-between items-center">
-            <div class="flex items-center gap-4">
-                <button onclick="toggleSidebar()" class="text-slate-400 hover:text-white">
-                    <i class="fas fa-bars text-lg"></i>
-                </button>
-                <h1 id="page-title" class="font-bold text-lg text-white">Tableau de Bord</h1>
-            </div>
-            
-            <div class="flex items-center gap-3">
-                <div class="relative">
-                    <button onclick="toggleNotifications()" class="relative p-2 text-slate-400 hover:text-white">
-                        <i class="fas fa-bell"></i>
-                        <span id="notification-badge" class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">3</span>
-                    </button>
+        <header class="glass-panel mx-4 mt-4 mb-6">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <div class="logo">
+                        <i class="fas fa-cog text-white"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-lg font-bold text-white" id="page-title">Tableau de Bord</h1>
+                        <p class="text-xs text-slate-400">Bonjour, <span id="username">Admin</span></p>
+                    </div>
                 </div>
                 
-                <div class="text-right">
-                    <p class="text-sm font-medium text-white" id="current-date">--/--/----</p>
-                    <p class="text-xs text-slate-400" id="current-time">--:--:--</p>
-                </div>
+                <button onclick="logout()" class="btn-secondary text-sm">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
             </div>
         </header>
         
-        <!-- Mobile Sidebar Overlay -->
-        <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden" onclick="toggleSidebar()"></div>
-        
-        <!-- Sidebar -->
-        <div id="sidebar" class="fixed left-0 top-0 h-full w-64 glass-panel z-50 transform -translate-x-full transition-transform duration-300 md:translate-x-0 md:relative md:transform-none">
-            <div class="p-4 border-b border-slate-700">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="logo-container scale-75">
-                        <div class="logo-shape-t-top"></div>
-                        <div class="logo-shape-t-stem"></div>
-                    </div>
-                    <button onclick="toggleSidebar()" class="md:hidden text-slate-400 hover:text-white">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                
-                <div class="flex items-center gap-3 mb-6">
-                    <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-                        <span class="font-bold text-white">A</span>
-                    </div>
-                    <div>
-                        <h3 class="font-bold text-white text-sm" id="user-name">Administrateur</h3>
-                        <p class="text-xs text-slate-400" id="user-role">Super Admin</p>
-                    </div>
-                </div>
-            </div>
-            
-            <nav class="p-3 space-y-1">
-                <a href="#" onclick="showView('dashboard')" class="sidebar-item active">
-                    <i class="fas fa-home w-5 text-center"></i>
-                    <span>Tableau de Bord</span>
-                </a>
-                <a href="#" onclick="showView('reports')" class="sidebar-item">
-                    <i class="fas fa-chart-bar w-5 text-center"></i>
-                    <span>Rapports</span>
-                </a>
-                <a href="#" onclick="showView('stations')" class="sidebar-item">
-                    <i class="fas fa-industry w-5 text-center"></i>
-                    <span>Stations</span>
-                </a>
-                <a href="#" onclick="showView('operations')" class="sidebar-item">
-                    <i class="fas fa-cogs w-5 text-center"></i>
-                    <span>Opérations</span>
-                </a>
-                <a href="#" onclick="showView('fuel')" class="sidebar-item">
-                    <i class="fas fa-gas-pump w-5 text-center"></i>
-                    <span>Gestion Carburant</span>
-                </a>
-                <a href="#" onclick="showView('users')" class="sidebar-item">
-                    <i class="fas fa-users w-5 text-center"></i>
-                    <span>Utilisateurs</span>
-                </a>
-                <a href="#" onclick="showView('settings')" class="sidebar-item">
-                    <i class="fas fa-cog w-5 text-center"></i>
-                    <span>Paramètres</span>
-                </a>
-            </nav>
-            
-            <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-slate-700">
-                <button onclick="handleLogout()" class="sidebar-item text-red-400 hover:text-red-300">
-                    <i class="fas fa-sign-out-alt w-5 text-center"></i>
-                    <span>Déconnexion</span>
-                </button>
-            </div>
-        </div>
-        
         <!-- Main Content -->
-        <main class="md:ml-64 p-4">
-            <!-- Dashboard View -->
-            <div id="view-dashboard" class="view fade-in active">
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                    <div class="glass-panel p-4 rounded-2xl border-l-4 border-blue-500">
-                        <p class="text-slate-400 text-xs font-bold uppercase">Volume Total</p>
-                        <h3 class="text-xl font-black">1,250 <small class="text-xs">m³</small></h3>
-                        <p class="text-green-500 text-xs mt-1"><i class="fas fa-arrow-up"></i> 5.2% depuis hier</p>
-                    </div>
-                    <div class="glass-panel p-4 rounded-2xl border-l-4 border-emerald-500">
-                        <p class="text-slate-400 text-xs font-bold uppercase">Carburant</p>
-                        <h3 class="text-xl font-black">450 <small class="text-xs">L</small></h3>
-                        <p class="text-red-500 text-xs mt-1"><i class="fas fa-arrow-down"></i> 2.1% depuis hier</p>
-                    </div>
-                    <div class="glass-panel p-4 rounded-2xl border-l-4 border-purple-500">
-                        <p class="text-slate-400 text-xs font-bold uppercase">Stations Actives</p>
-                        <h3 class="text-xl font-black">8 <small class="text-xs">/12</small></h3>
-                        <p class="text-green-500 text-xs mt-1"><i class="fas fa-check-circle"></i> 66% opérationnelles</p>
-                    </div>
-                    <div class="glass-panel p-4 rounded-2xl border-l-4 border-amber-500">
-                        <p class="text-slate-400 text-xs font-bold uppercase">Alertes</p>
-                        <h3 class="text-xl font-black">3</h3>
-                        <p class="text-amber-500 text-xs mt-1"><i class="fas fa-exclamation-triangle"></i> Requiert attention</p>
-                    </div>
+        <main class="container mx-auto px-4 pb-20">
+            <!-- Tabs Navigation -->
+            <div class="tabs">
+                <div class="tab active" onclick="showTab('dashboard')">
+                    <i class="fas fa-home"></i>
+                    <span class="ml-2">Dashboard</span>
                 </div>
-                
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                    <div class="glass-panel p-4 rounded-2xl">
-                        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-4">
-                            <h3 class="font-bold text-white">Consommation Mensuelle</h3>
-                            <select class="smart-input text-sm">
-                                <option>Janvier 2024</option>
-                                <option>Février 2024</option>
-                                <option>Mars 2024</option>
-                            </select>
-                        </div>
-                        <canvas id="monthlyChart" height="250"></canvas>
-                    </div>
-                    
-                    <div class="glass-panel p-4 rounded-2xl">
-                        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-4">
-                            <h3 class="font-bold text-white">Statut des Stations</h3>
-                            <button onclick="showView('stations')" class="text-sm text-blue-400 hover:text-blue-300">Voir tout</button>
-                        </div>
-                        <canvas id="stationsChart" height="250"></canvas>
-                    </div>
+                <div class="tab" onclick="showTab('reports')">
+                    <i class="fas fa-chart-bar"></i>
+                    <span class="ml-2">Rapports</span>
                 </div>
-                
-                <div class="glass-panel p-4 rounded-2xl mb-6">
-                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-4">
-                        <h3 class="font-bold text-white">Dernières Opérations</h3>
-                        <button onclick="showView('operations')" class="text-sm text-blue-400 hover:text-blue-300">Voir tout</button>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Station</th>
-                                    <th>Type</th>
-                                    <th>Volume (m³)</th>
-                                    <th>Statut</th>
-                                    <th>Date</th>
-                                </tr>
-                            </thead>
-                            <tbody id="recent-operations">
-                                <!-- Operations will be loaded here -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    <button onclick="openReportModal()" class="glass-panel p-4 rounded-2xl flex flex-col items-center justify-center hover:border-blue-500 cursor-pointer transition-all active:scale-95">
-                        <div class="w-12 h-12 bg-gradient-to-br from-blue-600 to-blue-700 rounded-full flex items-center justify-center mb-3">
-                            <i class="fas fa-plus-circle text-xl text-white"></i>
-                        </div>
-                        <h3 class="font-bold text-white text-base mb-1">Nouveau Rapport</h3>
-                        <p class="text-slate-400 text-center text-xs">Créer un nouveau rapport d'opération</p>
-                    </button>
-                    
-                    <button onclick="openAlertModal()" class="glass-panel p-4 rounded-2xl flex flex-col items-center justify-center hover:border-amber-500 cursor-pointer transition-all active:scale-95">
-                        <div class="w-12 h-12 bg-gradient-to-br from-amber-600 to-amber-700 rounded-full flex items-center justify-center mb-3">
-                            <i class="fas fa-bell text-xl text-white"></i>
-                        </div>
-                        <h3 class="font-bold text-white text-base mb-1">Alertes Système</h3>
-                        <p class="text-slate-400 text-center text-xs">Voir et gérer les alertes</p>
-                    </button>
+                <div class="tab" onclick="showTab('settings')">
+                    <i class="fas fa-cog"></i>
+                    <span class="ml-2">Paramètres</span>
                 </div>
             </div>
             
-            <!-- Reports View -->
-            <div id="view-reports" class="view fade-in">
-                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
-                    <h2 class="text-xl font-bold text-white">Gestion des Rapports</h2>
-                    <button onclick="openReportModal()" class="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-2 px-4 rounded-lg font-medium transition-all flex items-center justify-center gap-2 active:scale-95">
-                        <i class="fas fa-plus"></i> Nouveau Rapport
-                    </button>
+            <!-- Dashboard Tab -->
+            <div id="dashboard-tab" class="view active fade-in">
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div class="stat-card">
+                        <p>Volume Total</p>
+                        <h3>1,250 m³</h3>
+                        <p class="text-green-500 text-xs">
+                            <i class="fas fa-arrow-up"></i> +5.2%
+                        </p>
+                    </div>
+                    
+                    <div class="stat-card" style="border-left-color: #10b981;">
+                        <p>Carburant</p>
+                        <h3>450 L</h3>
+                        <p class="text-red-500 text-xs">
+                            <i class="fas fa-arrow-down"></i> -2.1%
+                        </p>
+                    </div>
                 </div>
                 
-                <div class="glass-panel p-4 rounded-2xl mb-6">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
-                        <input type="date" class="smart-input" id="report-date-filter">
-                        <select class="smart-input" id="report-type-filter">
-                            <option value="">Tous les types</option>
-                            <option value="daily">Journalier</option>
-                            <option value="weekly">Hebdomadaire</option>
-                            <option value="monthly">Mensuel</option>
-                        </select>
-                        <select class="smart-input" id="report-status-filter">
-                            <option value="">Tous les statuts</option>
-                            <option value="completed">Complété</option>
-                            <option value="pending">En attente</option>
-                            <option value="draft">Brouillon</option>
-                        </select>
-                        <button onclick="filterReports()" class="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-2 px-4 rounded-lg font-medium transition-all active:scale-95">
-                            <i class="fas fa-filter"></i> Filtrer
+                <!-- Quick Actions -->
+                <div class="glass-panel mb-6">
+                    <h2 class="text-lg font-bold text-white mb-4">Actions Rapides</h2>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button onclick="createReport()" class="btn-secondary flex items-center justify-center gap-2">
+                            <i class="fas fa-plus"></i>
+                            Nouveau Rapport
+                        </button>
+                        <button onclick="showAlert()" class="btn-secondary flex items-center justify-center gap-2">
+                            <i class="fas fa-bell"></i>
+                            Alertes (3)
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Recent Activities -->
+                <div class="glass-panel">
+                    <h2 class="text-lg font-bold text-white mb-4">Activités Récentes</h2>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg">
+                            <div>
+                                <p class="text-white font-medium">Pompage Station A</p>
+                                <p class="text-slate-400 text-sm">150 m³ • Aujourd'hui</p>
+                            </div>
+                            <span class="px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-xs">
+                                Terminé
+                            </span>
+                        </div>
+                        
+                        <div class="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg">
+                            <div>
+                                <p class="text-white font-medium">Maintenance Station B</p>
+                                <p class="text-slate-400 text-sm">En cours • Hier</p>
+                            </div>
+                            <span class="px-3 py-1 bg-yellow-500/20 text-yellow-400 rounded-full text-xs">
+                                En cours
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Reports Tab -->
+            <div id="reports-tab" class="view fade-in">
+                <div class="glass-panel mb-4">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-lg font-bold text-white">Rapports</h2>
+                        <button onclick="createReport()" class="btn-primary py-2 px-4 text-sm">
+                            <i class="fas fa-plus"></i> Nouveau
                         </button>
                     </div>
                     
-                    <div class="overflow-x-auto">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Titre</th>
-                                    <th>Type</th>
-                                    <th>Station</th>
-                                    <th>Volume (m³)</th>
-                                    <th>Date</th>
-                                    <th>Statut</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="reports-table">
-                                <!-- Reports will be loaded here -->
-                            </tbody>
-                        </table>
+                    <div class="space-y-3">
+                        <div class="p-4 bg-slate-800/50 rounded-lg">
+                            <div class="flex justify-between items-start mb-2">
+                                <h3 class="text-white font-medium">Rapport Mensuel Janvier</h3>
+                                <span class="px-2 py-1 bg-green-500/20 text-green-400 rounded text-xs">
+                                    Complet
+                                </span>
+                            </div>
+                            <p class="text-slate-400 text-sm mb-3">Volume total: 1,250 m³ • Carburant: 450 L</p>
+                            <div class="flex gap-2">
+                                <button class="text-blue-400 text-sm">
+                                    <i class="fas fa-eye"></i> Voir
+                                </button>
+                                <button class="text-green-400 text-sm">
+                                    <i class="fas fa-download"></i> Télécharger
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="p-4 bg-slate-800/50 rounded-lg">
+                            <div class="flex justify-between items-start mb-2">
+                                <h3 class="text-white font-medium">Rapport Hebdomadaire</h3>
+                                <span class="px-2 py-1 bg-yellow-500/20 text-yellow-400 rounded text-xs">
+                                    En attente
+                                </span>
+                            </div>
+                            <p class="text-slate-400 text-sm mb-3">Volume: 450 m³ • Carburant: 180 L</p>
+                            <div class="flex gap-2">
+                                <button class="text-blue-400 text-sm">
+                                    <i class="fas fa-edit"></i> Modifier
+                                </button>
+                                <button class="text-red-400 text-sm">
+                                    <i class="fas fa-trash"></i> Supprimer
+                                </button>
+                            </div>
+                        </div>
                     </div>
+                </div>
+            </div>
+            
+            <!-- Settings Tab -->
+            <div id="settings-tab" class="view fade-in">
+                <div class="glass-panel">
+                    <h2 class="text-lg font-bold text-white mb-4">Paramètres</h2>
                     
-                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mt-6">
-                        <div class="text-sm text-slate-400">
-                            Affichage <span id="report-start">1</span>-<span id="report-end">10</span> de <span id="report-total">0</span>
+                    <div class="space-y-4">
+                        <!-- Profile Settings -->
+                        <div class="p-4 bg-slate-800/50 rounded-lg">
+                            <h3 class="text-white font-medium mb-3">Profil Utilisateur</h3>
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="block text-sm text-slate-300 mb-1">Nom</label>
+                                    <input type="text" class="smart-input" value="Administrateur">
+                                </div>
+                                <div>
+                                    <label class="block text-sm text-slate-300 mb-1">Email</label>
+                                    <input type="email" class="smart-input" value="admin@sotutrasm.com">
+                                </div>
+                                <button class="btn-primary py-2 text-sm">
+                                    <i class="fas fa-save"></i> Sauvegarder
+                                </button>
+                            </div>
                         </div>
-                        <div class="flex gap-2">
-                            <button onclick="previousReportPage()" class="smart-input px-4 py-2 text-sm active:scale-95">Précédent</button>
-                            <button onclick="nextReportPage()" class="smart-input px-4 py-2 text-sm active:scale-95">Suivant</button>
+                        
+                        <!-- System Settings -->
+                        <div class="p-4 bg-slate-800/50 rounded-lg">
+                            <h3 class="text-white font-medium mb-3">Paramètres Système</h3>
+                            <div class="space-y-3">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-slate-300">Notifications</span>
+                                    <label class="switch">
+                                        <input type="checkbox" checked>
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                                
+                                <div class="flex items-center justify-between">
+                                    <span class="text-slate-300">Mode Sombre</span>
+                                    <label class="switch">
+                                        <input type="checkbox" checked>
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Stations View -->
-            <div id="view-stations" class="view fade-in">
-                <div class="mb-6">
-                    <h2 class="text-xl font-bold text-white mb-4">Gestion des Stations</h2>
-                    <div class="glass-panel p-4 rounded-2xl">
-                        <p class="text-slate-400 text-center py-8">Interface de gestion des stations en cours de développement...</p>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Operations View -->
-            <div id="view-operations" class="view fade-in">
-                <div class="mb-6">
-                    <h2 class="text-xl font-bold text-white mb-4">Opérations</h2>
-                    <div class="glass-panel p-4 rounded-2xl">
-                        <p class="text-slate-400 text-center py-8">Interface de gestion des opérations en cours de développement...</p>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Fuel Management View -->
-            <div id="view-fuel" class="view fade-in">
-                <div class="mb-6">
-                    <h2 class="text-xl font-bold text-white mb-4">Gestion du Carburant</h2>
-                    <div class="glass-panel p-4 rounded-2xl">
-                        <p class="text-slate-400 text-center py-8">Interface de gestion du carburant en cours de développement...</p>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Users Management View -->
-            <div id="view-users" class="view fade-in">
-                <div class="mb-6">
-                    <h2 class="text-xl font-bold text-white mb-4">Gestion des Utilisateurs</h2>
-                    <div class="glass-panel p-4 rounded-2xl">
-                        <p class="text-slate-400 text-center py-8">Interface de gestion des utilisateurs en cours de développement...</p>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Settings View -->
-            <div id="view-settings" class="view fade-in">
-                <div class="mb-6">
-                    <h2 class="text-xl font-bold text-white mb-4">Paramètres Système</h2>
-                    <div class="glass-panel p-4 rounded-2xl">
-                        <p class="text-slate-400 text-center py-8">Interface des paramètres système en cours de développement...</p>
+                        
+                        <!-- About -->
+                        <div class="p-4 bg-slate-800/50 rounded-lg">
+                            <h3 class="text-white font-medium mb-3">À Propos</h3>
+                            <p class="text-slate-400 text-sm mb-2">
+                                <strong>SOTUTRASM Smart Manager V8.0</strong>
+                            </p>
+                            <p class="text-slate-400 text-sm">
+                                Système de Gestion Intelligent
+                            </p>
+                            <p class="text-slate-400 text-xs mt-3">
+                                © 2024 Tous droits réservés
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
         </main>
         
-        <!-- Footer -->
-        <footer class="md:ml-64 p-4 text-center text-slate-400 text-sm border-t border-slate-800">
-            <p>SOTUTRASM Smart Manager V8.0 • © 2024 Tous droits réservés</p>
-            <p class="mt-1">Système de Gestion Intelligent</p>
-        </footer>
+        <!-- Bottom Navigation (Mobile) -->
+        <nav class="fixed bottom-0 left-0 right-0 glass-panel border-t border-white/10">
+            <div class="flex justify-around items-center py-3">
+                <button onclick="showTab('dashboard')" class="flex flex-col items-center text-blue-400">
+                    <i class="fas fa-home text-lg"></i>
+                    <span class="text-xs mt-1">Dashboard</span>
+                </button>
+                
+                <button onclick="showTab('reports')" class="flex flex-col items-center text-slate-400">
+                    <i class="fas fa-chart-bar text-lg"></i>
+                    <span class="text-xs mt-1">Rapports</span>
+                </button>
+                
+                <button onclick="showTab('settings')" class="flex flex-col items-center text-slate-400">
+                    <i class="fas fa-cog text-lg"></i>
+                    <span class="text-xs mt-1">Paramètres</span>
+                </button>
+            </div>
+        </nav>
     </div>
-
-    <!-- Modals -->
-    <div id="modal-overlay" class="modal-overlay">
-        <div id="report-modal" class="modal-content hidden">
+    
+    <!-- Alert Modal -->
+    <div id="alert-modal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+        <div class="glass-panel max-w-md w-full">
             <div class="flex justify-between items-center mb-4">
-                <h2 class="text-lg font-bold text-white">Nouveau Rapport</h2>
-                <button onclick="closeModal()" class="text-slate-400 hover:text-white">
+                <h3 class="text-lg font-bold text-white">Alertes Système</h3>
+                <button onclick="closeAlert()" class="text-slate-400 hover:text-white">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            <form id="report-form">
-                <div class="space-y-4">
-                    <div>
-                        <label class="text-sm font-bold text-slate-400 mb-2 block">Titre du Rapport</label>
-                        <input type="text" class="smart-input" required placeholder="Entrez le titre du rapport">
-                    </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            
+            <div class="space-y-3">
+                <div class="p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
+                    <div class="flex items-start gap-3">
+                        <i class="fas fa-exclamation-triangle text-red-400 mt-1"></i>
                         <div>
-                            <label class="text-sm font-bold text-slate-400 mb-2 block">Type</label>
-                            <select class="smart-input" required>
-                                <option value="daily">Journalier</option>
-                                <option value="weekly">Hebdomadaire</option>
-                                <option value="monthly">Mensuel</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="text-sm font-bold text-slate-400 mb-2 block">Station</label>
-                            <select class="smart-input" required>
-                                <option value="station1">Station Principale</option>
-                                <option value="station2">Station Est</option>
-                                <option value="station3">Station Ouest</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div>
-                        <label class="text-sm font-bold text-slate-400 mb-2 block">Description</label>
-                        <textarea class="smart-input" rows="3" placeholder="Description détaillée du rapport"></textarea>
-                    </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div>
-                            <label class="text-sm font-bold text-slate-400 mb-2 block">Volume (m³)</label>
-                            <input type="number" class="smart-input" min="0" step="0.1" required placeholder="0.0">
-                        </div>
-                        <div>
-                            <label class="text-sm font-bold text-slate-400 mb-2 block">Carburant (L)</label>
-                            <input type="number" class="smart-input" min="0" step="0.1" required placeholder="0.0">
+                            <p class="text-white font-medium">Carburant bas</p>
+                            <p class="text-slate-400 text-sm">Station Est - Niveau critique</p>
                         </div>
                     </div>
                 </div>
-                <div class="flex justify-end gap-3 mt-6">
-                    <button type="button" onclick="closeModal()" class="smart-input px-6 py-2 active:scale-95">Annuler</button>
-                    <button type="submit" class="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-2 px-6 rounded-lg font-medium transition-all active:scale-95">
-                        Enregistrer
-                    </button>
+                
+                <div class="p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
+                    <div class="flex items-start gap-3">
+                        <i class="fas fa-tools text-yellow-400 mt-1"></i>
+                        <div>
+                            <p class="text-white font-medium">Maintenance requise</p>
+                            <p class="text-slate-400 text-sm">Station Ouest - Demain 10:00</p>
+                        </div>
+                    </div>
                 </div>
-            </form>
+            </div>
+            
+            <button onclick="closeAlert()" class="btn-primary mt-4">
+                <i class="fas fa-check"></i> Compris
+            </button>
         </div>
-        
-        <div id="alert-modal" class="modal-content hidden">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-lg font-bold text-white">Alertes Système</h2>
-                <button onclick="closeModal()" class="text-slate-400 hover:text-white">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div id="alerts-list">
-                <!-- Alerts will be loaded here -->
-            </div>
-            <div class="flex justify-end mt-6">
-                <button onclick="closeModal()" class="smart-input px-6 py-2 active:scale-95">Fermer</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Loading Indicator -->
-    <div id="loading" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-1000">
-        <div class="spinner"></div>
     </div>
 
     <script>
-        // Mock Database
-        const mockDatabase = {
-            users: [
-                { id: 1, name: "Administrateur", email: "admin@sotutrasm.com", role: "Super Admin", avatar: "A" },
-                { id: 2, name: "Manager Est", email: "manager@est.com", role: "Manager", avatar: "M" },
-                { id: 3, name: "Technicien 1", email: "tech1@example.com", role: "Technicien", avatar: "T" }
-            ],
-            
-            stations: [
-                { id: 1, name: "Station Principale", location: "Zone Centre", status: "active", volume: 500, fuel: 200 },
-                { id: 2, name: "Station Est", location: "Zone Est", status: "active", volume: 300, fuel: 150 },
-                { id: 3, name: "Station Ouest", location: "Zone Ouest", status: "maintenance", volume: 200, fuel: 100 }
-            ],
-            
-            operations: [
-                { id: 1, station: "Station Principale", type: "Pompage", volume: 150, fuel: 50, status: "completed", date: "2024-01-15" },
-                { id: 2, station: "Station Est", type: "Transfert", volume: 80, fuel: 30, status: "pending", date: "2024-01-16" },
-                { id: 3, station: "Station Ouest", type: "Maintenance", volume: 0, fuel: 20, status: "in-progress", date: "2024-01-16" },
-                { id: 4, station: "Station Principale", type: "Pompage", volume: 120, fuel: 40, status: "completed", date: "2024-01-14" }
-            ],
-            
-            reports: [
-                { id: 1, title: "Rapport Journalier", type: "daily", station: "Station Principale", volume: 450, status: "completed", date: "2024-01-15" },
-                { id: 2, title: "Rapport Hebdomadaire", type: "weekly", station: "Toutes", volume: 1250, status: "completed", date: "2024-01-14" },
-                { id: 3, title: "Maintenance Mensuelle", type: "monthly", station: "Station Ouest", volume: 0, status: "pending", date: "2024-01-16" }
-            ],
-            
-            alerts: [
-                { id: 1, type: "warning", message: "Niveau de carburant bas à la Station Est", date: "2024-01-16 10:30", priority: "high" },
-                { id: 2, type: "info", message: "Maintenance programmée pour demain", date: "2024-01-16 09:15", priority: "medium" },
-                { id: 3, type: "error", message: "Erreur de capteur à la Station Ouest", date: "2024-01-16 08:45", priority: "high" }
-            ]
-        };
-
-        // State Management
-        let currentUser = null;
-        let currentView = 'dashboard';
-        let reportsPage = 1;
-        const reportsPerPage = 10;
-
-        // DOM Elements
-        const elements = {
-            views: {
-                login: document.getElementById('view-login'),
-                app: document.getElementById('app')
-            },
-            modals: {
-                overlay: document.getElementById('modal-overlay'),
-                report: document.getElementById('report-modal'),
-                alert: document.getElementById('alert-modal')
-            },
-            sidebar: document.getElementById('sidebar'),
-            sidebarOverlay: document.getElementById('sidebar-overlay'),
-            loading: document.getElementById('loading')
-        };
-
-        // Initialization
+        // Initialize the app
         document.addEventListener('DOMContentLoaded', function() {
-            initializeSystem();
-            updateDateTime();
-            setInterval(updateDateTime, 1000);
-            
             // Check if user is already logged in
-            if (localStorage.getItem('sotutrasm_logged_in') === 'true') {
-                simulateLogin();
+            if (localStorage.getItem('sotutrasm_logged') === 'true') {
+                showApp();
             }
         });
-
-        // Authentication Functions
-        function handleLogin() {
-            const email = document.getElementById('login-email').value.trim();
-            const password = document.getElementById('login-password').value.trim();
-
-            if (email === "admin@sotutrasm.com" && password === "admin123") {
-                showLoading();
-                setTimeout(() => {
-                    simulateLogin();
-                }, 800);
+        
+        // Login function
+        function login() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            // Simple validation
+            if (email === 'admin@sotutrasm.com' && password === 'admin123') {
+                // Save login state
+                localStorage.setItem('sotutrasm_logged', 'true');
+                localStorage.setItem('sotutrasm_user', 'Admin');
+                
+                // Show main app
+                showApp();
             } else {
-                showError("Erreur: Identifiants invalides");
+                alert('Email ou mot de passe incorrect!');
             }
         }
-
-        function simulateLogin() {
-            currentUser = mockDatabase.users[0];
-            elements.views.login.classList.add('hidden');
-            elements.views.app.classList.remove('hidden');
-            localStorage.setItem('sotutrasm_logged_in', 'true');
-            initializeDashboard();
-            hideLoading();
+        
+        // Logout function
+        function logout() {
+            if (confirm('Voulez-vous vous déconnecter?')) {
+                localStorage.removeItem('sotutrasm_logged');
+                localStorage.removeItem('sotutrasm_user');
+                hideApp();
+            }
         }
-
-        function handleLogout() {
-            showLoading();
-            setTimeout(() => {
-                elements.views.app.classList.add('hidden');
-                elements.views.login.classList.remove('hidden');
-                localStorage.removeItem('sotutrasm_logged_in');
-                currentUser = null;
-                hideLoading();
-            }, 500);
-        }
-
-        // View Management
-        function showView(viewName) {
-            // Update current view
-            currentView = viewName;
+        
+        // Show main app
+        function showApp() {
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('app').style.display = 'block';
             
-            // Hide all views
-            document.querySelectorAll('.view').forEach(view => {
-                view.classList.remove('active');
+            // Set username
+            const user = localStorage.getItem('sotutrasm_user') || 'Admin';
+            document.getElementById('username').textContent = user;
+        }
+        
+        // Hide main app (show login)
+        function hideApp() {
+            document.getElementById('login-screen').style.display = 'flex';
+            document.getElementById('app').style.display = 'none';
+        }
+        
+        // Tab navigation
+        function showTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.view').forEach(tab => {
+                tab.classList.remove('active');
             });
             
-            // Update sidebar items
-            document.querySelectorAll('.sidebar-item').forEach(item => {
-                item.classList.remove('active');
+            // Remove active class from all tab buttons
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
             });
             
-            // Show selected view
-            const targetView = document.getElementById(`view-${viewName}`);
-            if (targetView) {
-                targetView.classList.add('active');
-                document.getElementById('page-title').textContent = getViewTitle(viewName);
-                
-                // Update sidebar active item
-                const sidebarItem = document.querySelector(`[onclick="showView('${viewName}')"]`);
-                if (sidebarItem) sidebarItem.classList.add('active');
-                
-                // Load view data
-                loadViewData(viewName);
-            }
+            // Remove active class from all mobile nav buttons
+            document.querySelectorAll('nav button').forEach(btn => {
+                btn.classList.remove('text-blue-400');
+                btn.classList.add('text-slate-400');
+            });
             
-            // Close sidebar on mobile
-            if (window.innerWidth < 768) {
-                toggleSidebar();
-            }
-        }
-
-        function getViewTitle(viewName) {
+            // Show selected tab
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+            
+            // Set page title
             const titles = {
                 'dashboard': 'Tableau de Bord',
                 'reports': 'Rapports',
-                'stations': 'Stations',
-                'operations': 'Opérations',
-                'fuel': 'Gestion Carburant',
-                'users': 'Utilisateurs',
                 'settings': 'Paramètres'
             };
-            return titles[viewName] || 'Tableau de Bord';
-        }
-
-        // Sidebar Functions
-        function toggleSidebar() {
-            elements.sidebar.classList.toggle('translate-x-0');
-            elements.sidebar.classList.toggle('-translate-x-full');
-            elements.sidebarOverlay.classList.toggle('hidden');
-        }
-
-        // Modal Functions
-        function openReportModal() {
-            elements.modals.overlay.style.display = 'flex';
-            elements.modals.report.classList.remove('hidden');
-        }
-
-        function openAlertModal() {
-            elements.modals.overlay.style.display = 'flex';
-            elements.modals.alert.classList.remove('hidden');
-            loadAlerts();
-        }
-
-        function closeModal() {
-            elements.modals.overlay.style.display = 'none';
-            document.querySelectorAll('.modal-content').forEach(modal => {
-                modal.classList.add('hidden');
-            });
-        }
-
-        // Loading Functions
-        function showLoading() {
-            elements.loading.classList.remove('hidden');
-        }
-
-        function hideLoading() {
-            elements.loading.classList.add('hidden');
-        }
-
-        // Data Loading Functions
-        function loadViewData(viewName) {
-            switch (viewName) {
-                case 'dashboard':
-                    loadDashboardData();
-                    break;
-                case 'reports':
-                    loadReportsData();
-                    break;
-                case 'stations':
-                    loadStationsData();
-                    break;
-                case 'operations':
-                    loadOperationsData();
-                    break;
-                case 'fuel':
-                    loadFuelData();
-                    break;
-                case 'users':
-                    loadUsersData();
-                    break;
-                case 'settings':
-                    loadSettingsData();
-                    break;
-            }
-        }
-
-        function loadDashboardData() {
-            // Load recent operations
-            const operationsHtml = mockDatabase.operations.map(op => `
-                <tr>
-                    <td>#${op.id}</td>
-                    <td>${op.station}</td>
-                    <td>${op.type}</td>
-                    <td>${op.volume}</td>
-                    <td><span class="status-badge ${getStatusClass(op.status)}">${getStatusText(op.status)}</span></td>
-                    <td>${op.date}</td>
-                </tr>
-            `).join('');
-            document.getElementById('recent-operations').innerHTML = operationsHtml;
+            document.getElementById('page-title').textContent = titles[tabName];
             
-            // Initialize charts if not already initialized
-            if (!window.chartsInitialized) {
-                initializeCharts();
-                window.chartsInitialized = true;
-            }
-            
-            // Update user info
-            if (currentUser) {
-                document.getElementById('user-name').textContent = currentUser.name;
-                document.getElementById('user-role').textContent = currentUser.role;
-            }
-        }
-
-        function loadReportsData() {
-            const start = (reportsPage - 1) * reportsPerPage;
-            const end = start + reportsPerPage;
-            const reports = mockDatabase.reports.slice(start, end);
-            
-            const reportsHtml = reports.map(report => `
-                <tr>
-                    <td>#${report.id}</td>
-                    <td class="font-medium">${report.title}</td>
-                    <td>${getReportType(report.type)}</td>
-                    <td>${report.station}</td>
-                    <td>${report.volume}</td>
-                    <td>${report.date}</td>
-                    <td><span class="status-badge ${getStatusClass(report.status)}">${getStatusText(report.status)}</span></td>
-                    <td>
-                        <div class="flex gap-2">
-                            <button onclick="viewReport(${report.id})" class="text-blue-400 hover:text-blue-300" title="Voir">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                            <button onclick="editReport(${report.id})" class="text-green-400 hover:text-green-300" title="Modifier">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button onclick="deleteReport(${report.id})" class="text-red-400 hover:text-red-300" title="Supprimer">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-            `).join('');
-            
-            document.getElementById('reports-table').innerHTML = reportsHtml;
-            document.getElementById('report-start').textContent = start + 1;
-            document.getElementById('report-end').textContent = Math.min(end, mockDatabase.reports.length);
-            document.getElementById('report-total').textContent = mockDatabase.reports.length;
-        }
-
-        function loadAlerts() {
-            const alertsHtml = mockDatabase.alerts.map(alert => `
-                <div class="p-4 border-b border-slate-700 last:border-b-0">
-                    <div class="flex items-start gap-3">
-                        <div class="w-8 h-8 rounded-full flex items-center justify-center ${getAlertColor(alert.type)} mt-1">
-                            <i class="fas ${getAlertIcon(alert.type)} text-white text-sm"></i>
-                        </div>
-                        <div class="flex-1">
-                            <p class="text-white text-sm">${alert.message}</p>
-                            <p class="text-slate-400 text-xs mt-1">${alert.date}</p>
-                        </div>
-                        <span class="status-badge ${getPriorityClass(alert.priority)} text-xs">${alert.priority}</span>
-                    </div>
-                </div>
-            `).join('');
-            
-            document.getElementById('alerts-list').innerHTML = alertsHtml;
-        }
-
-        // Chart Functions
-        function initializeCharts() {
-            // Monthly Consumption Chart
-            const monthlyCtx = document.getElementById('monthlyChart');
-            if (monthlyCtx) {
-                new Chart(monthlyCtx.getContext('2d'), {
-                    type: 'line',
-                    data: {
-                        labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun'],
-                        datasets: [{
-                            label: 'Consommation (m³)',
-                            data: [1200, 1300, 1250, 1400, 1350, 1500],
-                            borderColor: '#3b82f6',
-                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                            borderWidth: 2,
-                            fill: true,
-                            tension: 0.4
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                labels: { 
-                                    color: '#e2e8f0',
-                                    font: { family: 'Poppins' }
-                                }
-                            }
-                        },
-                        scales: {
-                            x: {
-                                grid: { 
-                                    color: 'rgba(255,255,255,0.1)',
-                                    drawBorder: false
-                                },
-                                ticks: { 
-                                    color: '#94a3b8',
-                                    font: { family: 'Poppins' }
-                                }
-                            },
-                            y: {
-                                grid: { 
-                                    color: 'rgba(255,255,255,0.1)',
-                                    drawBorder: false
-                                },
-                                ticks: { 
-                                    color: '#94a3b8',
-                                    font: { family: 'Poppins' }
-                                }
-                            }
-                        }
-                    }
-                });
-            }
-            
-            // Stations Status Chart
-            const stationsCtx = document.getElementById('stationsChart');
-            if (stationsCtx) {
-                new Chart(stationsCtx.getContext('2d'), {
-                    type: 'doughnut',
-                    data: {
-                        labels: ['Actives', 'Maintenance', 'Inactives'],
-                        datasets: [{
-                            data: [8, 2, 2],
-                            backgroundColor: [
-                                '#10b981',
-                                '#f59e0b',
-                                '#ef4444'
-                            ],
-                            borderWidth: 0
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                position: 'bottom',
-                                labels: { 
-                                    color: '#e2e8f0',
-                                    font: { family: 'Poppins', size: 12 }
-                                }
-                            }
-                        }
-                    }
-                });
-            }
-        }
-
-        // Utility Functions
-        function getStatusClass(status) {
-            const classes = {
-                'completed': 'status-active',
-                'pending': 'status-pending',
-                'in-progress': 'status-pending',
-                'draft': 'status-inactive',
-                'active': 'status-active',
-                'maintenance': 'status-pending',
-                'inactive': 'status-inactive'
-            };
-            return classes[status] || 'status-pending';
-        }
-
-        function getStatusText(status) {
-            const texts = {
-                'completed': 'Complété',
-                'pending': 'En attente',
-                'in-progress': 'En cours',
-                'draft': 'Brouillon',
-                'active': 'Actif',
-                'maintenance': 'Maintenance',
-                'inactive': 'Inactif'
-            };
-            return texts[status] || status;
-        }
-
-        function getReportType(type) {
-            const types = {
-                'daily': 'Journalier',
-                'weekly': 'Hebdomadaire',
-                'monthly': 'Mensuel'
-            };
-            return types[type] || type;
-        }
-
-        function getAlertColor(type) {
-            const colors = {
-                'warning': 'bg-amber-500',
-                'info': 'bg-blue-500',
-                'error': 'bg-red-500',
-                'success': 'bg-green-500'
-            };
-            return colors[type] || 'bg-slate-500';
-        }
-
-        function getAlertIcon(type) {
-            const icons = {
-                'warning': 'fa-exclamation-triangle',
-                'info': 'fa-info-circle',
-                'error': 'fa-times-circle',
-                'success': 'fa-check-circle'
-            };
-            return icons[type] || 'fa-bell';
-        }
-
-        function getPriorityClass(priority) {
-            const classes = {
-                'high': 'status-inactive',
-                'medium': 'status-pending',
-                'low': 'status-active'
-            };
-            return classes[priority] || 'status-pending';
-        }
-
-        // System Functions
-        function initializeSystem() {
-            // Close modals when clicking outside
-            elements.modals.overlay.addEventListener('click', function(e) {
-                if (e.target === elements.modals.overlay) {
-                    closeModal();
+            // Update tab button
+            document.querySelectorAll('.tab').forEach(tab => {
+                if (tab.textContent.includes(titles[tabName])) {
+                    tab.classList.add('active');
                 }
             });
             
-            // Report form submission
-            document.getElementById('report-form').addEventListener('submit', function(e) {
-                e.preventDefault();
-                createReport();
-            });
-            
-            // Close sidebar when clicking on overlay
-            elements.sidebarOverlay.addEventListener('click', toggleSidebar);
-            
-            // Initialize tooltips
-            initializeTooltips();
-        }
-
-        function updateDateTime() {
-            const now = new Date();
-            const dateOptions = { day: '2-digit', month: '2-digit', year: 'numeric' };
-            const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit' };
-            
-            document.getElementById('current-date').textContent = 
-                now.toLocaleDateString('fr-FR', dateOptions);
-            document.getElementById('current-time').textContent = 
-                now.toLocaleTimeString('fr-FR', timeOptions);
-        }
-
-        function initializeDashboard() {
-            // Set initial view
-            showView('dashboard');
-            
-            // Initialize charts on next frame
-            setTimeout(() => {
-                initializeCharts();
-            }, 100);
-        }
-
-        function initializeTooltips() {
-            // Simple tooltip implementation
-            document.querySelectorAll('[title]').forEach(element => {
-                element.addEventListener('mouseenter', function(e) {
-                    const title = this.getAttribute('title');
-                    if (title) {
-                        const tooltip = document.createElement('div');
-                        tooltip.className = 'fixed z-50 px-2 py-1 text-xs bg-gray-900 text-white rounded opacity-0 transition-opacity';
-                        tooltip.textContent = title;
-                        document.body.appendChild(tooltip);
-                        
-                        const rect = this.getBoundingClientRect();
-                        tooltip.style.left = rect.left + 'px';
-                        tooltip.style.top = (rect.top - 30) + 'px';
-                        
-                        setTimeout(() => tooltip.classList.add('opacity-100'), 10);
-                        
-                        this._tooltip = tooltip;
-                        this.removeAttribute('title');
-                    }
-                });
-                
-                element.addEventListener('mouseleave', function() {
-                    if (this._tooltip) {
-                        this._tooltip.remove();
-                        this.setAttribute('title', this._tooltip.textContent);
-                        delete this._tooltip;
-                    }
-                });
-            });
-        }
-
-        // Report Management Functions
-        function filterReports() {
-            // Simple filter implementation
-            loadReportsData();
-        }
-
-        function previousReportPage() {
-            if (reportsPage > 1) {
-                reportsPage--;
-                loadReportsData();
+            // Update mobile navigation
+            const mobileBtns = document.querySelectorAll('nav button');
+            if (tabName === 'dashboard') {
+                mobileBtns[0].classList.add('text-blue-400');
+                mobileBtns[0].classList.remove('text-slate-400');
+            } else if (tabName === 'reports') {
+                mobileBtns[1].classList.add('text-blue-400');
+                mobileBtns[1].classList.remove('text-slate-400');
+            } else if (tabName === 'settings') {
+                mobileBtns[2].classList.add('text-blue-400');
+                mobileBtns[2].classList.remove('text-slate-400');
             }
         }
-
-        function nextReportPage() {
-            const totalPages = Math.ceil(mockDatabase.reports.length / reportsPerPage);
-            if (reportsPage < totalPages) {
-                reportsPage++;
-                loadReportsData();
-            }
+        
+        // Alert modal functions
+        function showAlert() {
+            document.getElementById('alert-modal').style.display = 'flex';
         }
-
+        
+        function closeAlert() {
+            document.getElementById('alert-modal').style.display = 'none';
+        }
+        
+        // Create report function
         function createReport() {
-            const form = document.getElementById('report-form');
-            const formData = new FormData(form);
-            
-            // Get form values
-            const title = form.querySelector('input[type="text"]').value;
-            const volume = form.querySelector('input[type="number"]').value;
-            
-            // Create new report
-            const newReport = {
-                id: mockDatabase.reports.length + 1,
-                title: title || "Nouveau Rapport",
-                type: "daily",
-                station: "Station Principale",
-                volume: parseFloat(volume) || 0,
-                status: "draft",
-                date: new Date().toISOString().split('T')[0]
-            };
-            
-            mockDatabase.reports.unshift(newReport);
-            
-            // Show success message
-            showSuccess("Rapport créé avec succès!");
-            
-            // Close modal and refresh data
-            closeModal();
-            showView('reports');
+            alert('Fonction de création de rapport bientôt disponible!');
+            // You can add more functionality here
         }
-
-        function viewReport(id) {
-            const report = mockDatabase.reports.find(r => r.id === id);
-            if (report) {
-                alert(`Rapport #${id}\nTitre: ${report.title}\nType: ${report.type}\nStation: ${report.station}\nVolume: ${report.volume}m³\nDate: ${report.date}\nStatut: ${report.status}`);
-            }
-        }
-
-        function editReport(id) {
-            const report = mockDatabase.reports.find(r => r.id === id);
-            if (report) {
-                openReportModal();
-                // Pre-fill form with report data
-                setTimeout(() => {
-                    const form = document.getElementById('report-form');
-                    form.querySelector('input[type="text"]').value = report.title;
-                    form.querySelector('input[type="number"]').value = report.volume;
-                    // Add edit mode flag
-                    form.dataset.editId = id;
-                }, 100);
-            }
-        }
-
-        function deleteReport(id) {
-            if (confirm('Êtes-vous sûr de vouloir supprimer ce rapport?')) {
-                const index = mockDatabase.reports.findIndex(r => r.id === id);
-                if (index > -1) {
-                    mockDatabase.reports.splice(index, 1);
-                    showSuccess("Rapport supprimé avec succès!");
-                    loadReportsData();
-                }
-            }
-        }
-
-        // Notification Functions
-        function toggleNotifications() {
-            openAlertModal();
-        }
-
-        // Message Functions
-        function showError(message) {
-            alert(message);
-        }
-
-        function showSuccess(message) {
-            // Create a simple success notification
-            const notification = document.createElement('div');
-            notification.className = 'fixed top-4 right-4 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg z-50 animate-fade-in';
-            notification.textContent = message;
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                notification.remove();
-            }, 3000);
-        }
-
-        // Data loading functions for other views
-        function loadStationsData() {
-            // Implementation for stations view
-        }
-
-        function loadOperationsData() {
-            // Implementation for operations view
-        }
-
-        function loadFuelData() {
-            // Implementation for fuel view
-        }
-
-        function loadUsersData() {
-            // Implementation for users view
-        }
-
-        function loadSettingsData() {
-            // Implementation for settings view
-        }
-
-        // Handle keyboard shortcuts
-        document.addEventListener('keydown', function(e) {
-            // Escape closes modals
-            if (e.key === 'Escape') {
-                closeModal();
-            }
-            
-            // Ctrl/Cmd + S saves current form
-            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
-                e.preventDefault();
-                const activeForm = document.querySelector('form:not([style*="display: none"])');
-                if (activeForm) {
-                    activeForm.dispatchEvent(new Event('submit'));
-                }
-            }
-        });
-
-        // Handle offline/online status
-        window.addEventListener('online', function() {
-            showSuccess("Connecté à Internet");
-        });
-
-        window.addEventListener('offline', function() {
-            showError("Pas de connexion Internet - Mode hors ligne activé");
-        });
-
-        // Add CSS for animations
+        
+        // Toggle switch style
         const style = document.createElement('style');
         style.textContent = `
-            @keyframes fade-in {
-                from { opacity: 0; transform: translateY(-10px); }
-                to { opacity: 1; transform: translateY(0); }
+            .switch {
+                position: relative;
+                display: inline-block;
+                width: 50px;
+                height: 24px;
             }
-            .animate-fade-in {
-                animation: fade-in 0.3s ease-out;
+            
+            .switch input {
+                opacity: 0;
+                width: 0;
+                height: 0;
+            }
+            
+            .slider {
+                position: absolute;
+                cursor: pointer;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: #475569;
+                transition: .3s;
+                border-radius: 34px;
+            }
+            
+            .slider:before {
+                position: absolute;
+                content: "";
+                height: 16px;
+                width: 16px;
+                left: 4px;
+                bottom: 4px;
+                background-color: white;
+                transition: .3s;
+                border-radius: 50%;
+            }
+            
+            input:checked + .slider {
+                background-color: #3b82f6;
+            }
+            
+            input:checked + .slider:before {
+                transform: translateX(26px);
             }
         `;
         document.head.appendChild(style);
-
-        // PWA features
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', function() {
-                navigator.serviceWorker.register('/service-worker.js')
-                    .then(() => console.log('Service Worker registered'))
-                    .catch(err => console.log('Service Worker registration failed:', err));
-            });
-        }
-
-        // Add app to home screen prompt
-        let deferredPrompt;
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            
-            // Show install button
-            setTimeout(() => {
-                if (deferredPrompt && confirm("Voulez-vous installer l'application SOTUTRASM sur votre écran d'accueil?")) {
-                    deferredPrompt.prompt();
-                    deferredPrompt.userChoice.then((choiceResult) => {
-                        deferredPrompt = null;
-                    });
-                }
-            }, 3000);
+        
+        // Close alert when clicking outside
+        document.getElementById('alert-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeAlert();
+            }
+        });
+        
+        // Add keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeAlert();
+            }
         });
     </script>
 </body>
