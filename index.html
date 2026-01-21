@@ -93,6 +93,72 @@
             color: var(--primary);
         }
         
+        /* Switch Dredge Button */
+        .switch-dredge-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s;
+        }
+        
+        .switch-dredge-btn:hover {
+            background-color: var(--primary-light);
+            transform: translateY(-1px);
+        }
+        
+        .switch-dredge-btn i {
+            font-size: 12px;
+        }
+        
+        /* Control Buttons */
+        .control-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+        
+        .control-btn {
+            background-color: var(--light);
+            border: 2px solid var(--gray);
+            color: var(--text);
+            padding: 10px 16px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s;
+            flex: 1;
+            min-width: 120px;
+            justify-content: center;
+        }
+        
+        .control-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        .control-btn.danger {
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+        
+        .control-btn.danger:hover {
+            background-color: var(--danger);
+            color: white;
+        }
+        
         /* Navigation */
         .nav-tabs {
             display: flex;
@@ -450,6 +516,14 @@
             .nav-tab span {
                 font-size: 12px;
             }
+            
+            .control-buttons {
+                flex-direction: column;
+            }
+            
+            .control-btn {
+                min-width: 100%;
+            }
         }
         
         /* Loading */
@@ -490,6 +564,49 @@
         
         .notification.show {
             transform: translateX(0);
+        }
+        
+        /* Reset Data Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            padding: 20px;
+        }
+        
+        .modal {
+            background-color: var(--light);
+            border-radius: var(--border-radius);
+            padding: 24px;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--text);
+        }
+        
+        .modal-text {
+            color: var(--dark-gray);
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
         }
     </style>
 </head>
@@ -553,10 +670,59 @@
                     <div class="dredge-info">1 moteur • CAT 3512</div>
                 </div>
             </div>
+            
+            <!-- Control Buttons -->
+            <div class="card mt-4">
+                <div class="control-buttons">
+                    <button class="control-btn" onclick="resetAllData()">
+                        <i class="fas fa-trash-alt"></i>
+                        Réinitialiser toutes les données
+                    </button>
+                    <button class="control-btn" onclick="resetTodayData()">
+                        <i class="fas fa-redo"></i>
+                        Réinitialiser données du jour
+                    </button>
+                    <button class="control-btn" onclick="clearTimer()">
+                        <i class="fas fa-stopwatch"></i>
+                        Réinitialiser minuteur
+                    </button>
+                </div>
+            </div>
         </div>
 
         <!-- Operations Screen -->
         <div id="operationsScreen" class="screen">
+            <!-- Control Bar -->
+            <div class="card mb-4">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h3 style="font-weight: 600; color: var(--primary);" id="currentDredgeTitle">
+                            Blue Shark
+                        </h3>
+                        <p style="color: var(--dark-gray); font-size: 14px;">Session en cours</p>
+                    </div>
+                    <button class="switch-dredge-btn" onclick="switchDredge()">
+                        <i class="fas fa-exchange-alt"></i>
+                        Changer de drague
+                    </button>
+                </div>
+                
+                <div class="control-buttons">
+                    <button class="control-btn" onclick="resetTodayData()">
+                        <i class="fas fa-redo"></i>
+                        Réinitialiser jour
+                    </button>
+                    <button class="control-btn" onclick="clearTimer()">
+                        <i class="fas fa-stopwatch"></i>
+                        Réinitialiser minuteur
+                    </button>
+                    <button class="control-btn danger" onclick="resetAllData()">
+                        <i class="fas fa-trash-alt"></i>
+                        Réinitialiser tout
+                    </button>
+                </div>
+            </div>
+
             <!-- Timer Section -->
             <div class="timer-container">
                 <div class="timer-display" id="timerDisplay">00:00:00</div>
@@ -627,7 +793,7 @@
             <div class="card">
                 <h3 class="card-title">
                     <i class="fas fa-chart-line"></i>
-                    Dashboard
+                    Dashboard du jour
                 </h3>
                 
                 <div class="stats-grid">
@@ -780,13 +946,27 @@
         </div>
     </main>
 
+    <!-- Reset Data Modal -->
+    <div id="resetModal" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-title" id="resetModalTitle">Réinitialiser les données</div>
+            <div class="modal-text" id="resetModalText">
+                Êtes-vous sûr de vouloir réinitialiser toutes les données ? Cette action est irréversible.
+            </div>
+            <div class="modal-actions">
+                <button class="control-btn" onclick="closeResetModal()">Annuler</button>
+                <button class="control-btn danger" onclick="confirmReset()">Confirmer</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Notification -->
     <div id="notification" class="notification">
         <i class="fas fa-check-circle"></i> <span id="notificationText">Opération réussie</span>
     </div>
 
     <script>
-        // Application State
+        // Application State - RESET TO DEFAULT ON PAGE LOAD
         let state = {
             currentDredge: null,
             selectedDredge: null,
@@ -796,12 +976,17 @@
                 elapsedTime: 0,
                 interval: null
             },
-            operations: [],
+            operations: [], // RESET on page load
+            dailyData: {
+                hours: 0,
+                volume: 0,
+                fuel: 0
+            },
             motors: {
                 'blue-shark': [
                     { id: 1, name: 'CAT C32', hours: 1250, lastOilChange: 1150, issues: [] },
                     { id: 2, name: 'CAT 3406', hours: 980, lastOilChange: 850, issues: [] },
-                    { id: 3, name: 'CAT 3512', hours: 2100, lastOilChange: 1950, issues: [] }
+                    { id: 3, name: 'IVECO', hours: 2100, lastOilChange: 1950, issues: [] }
                 ],
                 'white-shark': [
                     { id: 1, name: 'CAT 3512', hours: 3200, lastOilChange: 3050, issues: [] }
@@ -823,24 +1008,105 @@
             ]
         };
 
+        // Variables for reset modal
+        let resetType = 'all'; // 'all', 'today', 'timer'
+        let pendingReset = false;
+
         // Initialize the application
         document.addEventListener('DOMContentLoaded', function() {
-            loadFromLocalStorage();
+            // RESET timer on page load
+            resetTimer();
+            
+            // Load from localStorage (but ignore timer data)
+            const saved = localStorage.getItem('sotutrasm_data');
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                
+                // Only load persistent data (not timer or daily data)
+                state.selectedDredge = parsed.selectedDredge;
+                state.operations = parsed.operations || [];
+                state.motors = parsed.motors || state.motors;
+                state.fuel = parsed.fuel || state.fuel;
+                state.reports = parsed.reports || state.reports;
+                
+                // Calculate daily data from today's operations
+                calculateDailyData();
+                
+                if (state.selectedDredge) {
+                    state.currentDredge = state.selectedDredge === 'blue-shark' ? 'Blue Shark' : 'White Shark';
+                    document.getElementById('currentDredge').innerHTML = `
+                        <strong>${state.currentDredge}</strong>
+                    `;
+                    document.getElementById('currentDredgeTitle').textContent = state.currentDredge;
+                    
+                    // Show main app if dredge is selected
+                    showMainApp();
+                }
+            }
+            
             updateFuelDisplay();
             loadReports();
             updateDashboard();
-            
-            // Check if dredge is already selected
-            if (state.selectedDredge) {
-                showMainApp();
-            }
             
             // Set up event listeners
             document.getElementById('reportType').addEventListener('change', function() {
                 document.getElementById('customDateRange').style.display = 
                     this.value === 'custom' ? 'block' : 'none';
             });
+            
+            // Show notification if coming from refresh
+            if (performance.navigation.type === 1) { // Page was refreshed
+                setTimeout(() => {
+                    showNotification('Application rechargée - Données du jour réinitialisées', 'info');
+                }, 1000);
+            }
         });
+
+        // Reset timer function
+        function resetTimer() {
+            if (state.timer.interval) {
+                clearInterval(state.timer.interval);
+            }
+            
+            state.timer = {
+                running: false,
+                startTime: null,
+                elapsedTime: 0,
+                interval: null
+            };
+            
+            document.getElementById('timerDisplay').textContent = '00:00:00';
+            document.getElementById('startBtn').style.display = 'flex';
+            document.getElementById('pauseBtn').style.display = 'none';
+        }
+
+        // Clear timer (public function)
+        function clearTimer() {
+            resetTimer();
+            showNotification('Minuteur réinitialisé', 'success');
+            saveToLocalStorage();
+        }
+
+        // Calculate daily data from operations
+        function calculateDailyData() {
+            const today = new Date().toISOString().split('T')[0];
+            state.dailyData = { hours: 0, volume: 0, fuel: 0 };
+            
+            state.operations.forEach(op => {
+                const opDate = op.date.split('T')[0];
+                if (opDate === today) {
+                    if (op.duration) {
+                        state.dailyData.hours += op.duration.hours + (op.duration.minutes / 60);
+                    }
+                    if (op.volume) {
+                        state.dailyData.volume += op.volume;
+                    }
+                    if (op.fuelConsumed) {
+                        state.dailyData.fuel += op.fuelConsumed;
+                    }
+                }
+            });
+        }
 
         // Dredge Selection
         function selectDredge(dredgeType) {
@@ -850,6 +1116,7 @@
             document.getElementById('currentDredge').innerHTML = `
                 <strong>${state.currentDredge}</strong>
             `;
+            document.getElementById('currentDredgeTitle').textContent = state.currentDredge;
             
             // Highlight selected dredge card
             document.querySelectorAll('.dredge-card').forEach(card => {
@@ -863,6 +1130,29 @@
             // Show confirmation and switch to main app after delay
             showNotification('Drague sélectionnée avec succès');
             setTimeout(showMainApp, 1000);
+        }
+
+        // Switch between dredges
+        function switchDredge() {
+            if (!state.selectedDredge) return;
+            
+            // Toggle between blue-shark and white-shark
+            const newDredge = state.selectedDredge === 'blue-shark' ? 'white-shark' : 'blue-shark';
+            
+            // Save current state
+            saveToLocalStorage();
+            
+            // Reset timer when switching dredges
+            resetTimer();
+            
+            // Select new dredge
+            selectDredge(newDredge);
+            
+            // Update UI
+            document.getElementById('currentDredgeTitle').textContent = 
+                newDredge === 'blue-shark' ? 'Blue Shark' : 'White Shark';
+            
+            showNotification(`Passage à ${newDredge === 'blue-shark' ? 'Blue Shark' : 'White Shark'}`, 'info');
         }
 
         function showMainApp() {
@@ -895,31 +1185,37 @@
         }
 
         function stopTimer() {
+            if (!state.timer.running && state.timer.elapsedTime === 0) {
+                showNotification('Le minuteur n\'a pas démarré', 'warning');
+                return;
+            }
+            
             state.timer.running = false;
             clearInterval(state.timer.interval);
-            state.timer.elapsedTime = 0;
             
-            document.getElementById('startBtn').style.display = 'flex';
-            document.getElementById('pauseBtn').style.display = 'none';
-            document.getElementById('timerDisplay').textContent = '00:00:00';
-            
-            // Record the operation
+            // Record the operation only if timer was running
             if (state.timer.startTime) {
                 const duration = Date.now() - state.timer.startTime;
                 const hours = Math.floor(duration / 3600000);
                 const minutes = Math.floor((duration % 3600000) / 60000);
                 
                 state.operations.push({
-                    date: new Date().toISOString().split('T')[0],
+                    date: new Date().toISOString(),
                     duration: { hours, minutes },
                     dredge: state.currentDredge,
-                    driver: document.getElementById('driverName').value
+                    driver: document.getElementById('driverName').value || 'Inconnu'
                 });
+                
+                // Update daily data
+                state.dailyData.hours += hours + (minutes / 60);
                 
                 updateDashboard();
                 saveToLocalStorage();
                 showNotification('Travail enregistré avec succès');
             }
+            
+            // Reset timer
+            resetTimer();
         }
 
         function updateTimerDisplay() {
@@ -959,7 +1255,13 @@
                     operator: document.getElementById('driverName').value || 'Inconnu'
                 });
                 updateFuelDisplay();
+                
+                // Update daily fuel
+                state.dailyData.fuel += fuel;
             }
+            
+            // Update daily volume
+            state.dailyData.volume += parseFloat(volume);
             
             // Add to operations
             state.operations.push({
@@ -982,7 +1284,88 @@
             showNotification('Opération enregistrée avec succès');
         }
 
-        // Motors Functions
+        // Reset Data Functions
+        function resetAllData() {
+            resetType = 'all';
+            document.getElementById('resetModalTitle').textContent = 'Réinitialiser toutes les données';
+            document.getElementById('resetModalText').textContent = 
+                'Êtes-vous sûr de vouloir réinitialiser TOUTES les données ? Cette action supprimera toutes les opérations, l\'historique carburant et les rapports. Cette action est irréversible.';
+            document.getElementById('resetModal').style.display = 'flex';
+        }
+
+        function resetTodayData() {
+            resetType = 'today';
+            document.getElementById('resetModalTitle').textContent = 'Réinitialiser les données du jour';
+            document.getElementById('resetModalText').textContent = 
+                'Êtes-vous sûr de vouloir réinitialiser les données du jour ? Cette action supprimera toutes les opérations d\'aujourd\'hui et réinitialisera le minuteur.';
+            document.getElementById('resetModal').style.display = 'flex';
+        }
+
+        function closeResetModal() {
+            document.getElementById('resetModal').style.display = 'none';
+        }
+
+        function confirmReset() {
+            closeResetModal();
+            
+            switch(resetType) {
+                case 'all':
+                    // Reset everything except default motor hours
+                    state.operations = [];
+                    state.dailyData = { hours: 0, volume: 0, fuel: 0 };
+                    state.fuel = {
+                        current: 6500,
+                        capacity: 10000,
+                        history: []
+                    };
+                    state.reports = [];
+                    resetTimer();
+                    
+                    // Reset motor hours to defaults
+                    state.motors = {
+                        'blue-shark': [
+                            { id: 1, name: 'CAT C32', hours: 1250, lastOilChange: 1150, issues: [] },
+                            { id: 2, name: 'CAT 3406', hours: 980, lastOilChange: 850, issues: [] },
+                            { id: 3, name: 'IVECO', hours: 2100, lastOilChange: 1950, issues: [] }
+                        ],
+                        'white-shark': [
+                            { id: 1, name: 'CAT 3512', hours: 3200, lastOilChange: 3050, issues: [] }
+                        ]
+                    };
+                    
+                    showNotification('Toutes les données ont été réinitialisées', 'success');
+                    break;
+                    
+                case 'today':
+                    // Remove today's operations
+                    const today = new Date().toISOString().split('T')[0];
+                    state.operations = state.operations.filter(op => {
+                        const opDate = op.date.split('T')[0];
+                        return opDate !== today;
+                    });
+                    
+                    // Reset daily data
+                    state.dailyData = { hours: 0, volume: 0, fuel: 0 };
+                    resetTimer();
+                    showNotification('Données du jour réinitialisées', 'success');
+                    break;
+                    
+                case 'timer':
+                    resetTimer();
+                    showNotification('Minuteur réinitialisé', 'success');
+                    break;
+            }
+            
+            updateDashboard();
+            updateFuelDisplay();
+            loadReports();
+            if (state.selectedDredge) {
+                loadMotors();
+            }
+            saveToLocalStorage();
+        }
+
+        // Motors Functions (same as before)
         function loadMotors() {
             const container = document.getElementById('motorsContainer');
             const motors = state.motors[state.selectedDredge];
@@ -1095,7 +1478,7 @@
             saveToLocalStorage();
         }
 
-        // Fuel Functions
+        // Fuel Functions (same as before)
         function updateFuelDisplay() {
             const percentage = Math.round((state.fuel.current / state.fuel.capacity) * 100);
             
@@ -1158,7 +1541,7 @@
             container.innerHTML = html || '<p class="text-center text-dark-gray">Aucun historique disponible</p>';
         }
 
-        // Reports Functions
+        // Reports Functions (same as before)
         function loadReports() {
             const container = document.getElementById('reportsList');
             let html = '';
@@ -1229,44 +1612,26 @@
 
         function downloadReport(reportId) {
             showNotification('Rapport téléchargé (simulation)');
-            // In a real app, this would generate and download a PDF
         }
 
         function exportPDF() {
             showNotification('PDF généré avec succès (simulation)');
-            // In a real app, this would generate a PDF report
         }
 
         // Dashboard Functions
         function updateDashboard() {
-            // Calculate totals
-            let totalHours = 0;
-            let totalVolume = 0;
-            let totalFuel = 0;
-            
-            state.operations.forEach(op => {
-                if (op.duration) {
-                    totalHours += op.duration.hours + (op.duration.minutes / 60);
-                }
-                if (op.volume) {
-                    totalVolume += op.volume;
-                }
-                if (op.fuelConsumed) {
-                    totalFuel += op.fuelConsumed;
-                }
-            });
-            
-            // Update display
+            // Use daily data for display
             document.getElementById('totalHours').textContent = 
-                `${Math.floor(totalHours)}h${Math.round((totalHours % 1) * 60)}`;
+                `${Math.floor(state.dailyData.hours)}h${Math.round((state.dailyData.hours % 1) * 60)}`;
             
             document.getElementById('totalVolume').textContent = 
-                `${totalVolume.toFixed(1)} m³`;
+                `${state.dailyData.volume.toFixed(1)} m³`;
             
             document.getElementById('totalFuel').textContent = 
-                `${totalFuel.toFixed(0)} L`;
+                `${state.dailyData.fuel.toFixed(0)} L`;
             
-            const efficiency = totalVolume > 0 ? (totalFuel / totalVolume).toFixed(1) : 0;
+            const efficiency = state.dailyData.volume > 0 ? 
+                (state.dailyData.fuel / state.dailyData.volume).toFixed(1) : 0;
             document.getElementById('efficiency').textContent = 
                 `${efficiency} L/m³`;
         }
@@ -1305,7 +1670,8 @@
             // Set color based on type
             notification.style.backgroundColor = 
                 type === 'success' ? '#10b981' : 
-                type === 'warning' ? '#f59e0b' : '#ef4444';
+                type === 'warning' ? '#f59e0b' : 
+                type === 'info' ? '#3b82f6' : '#ef4444';
             
             text.textContent = message;
             notification.classList.add('show');
@@ -1317,22 +1683,17 @@
 
         // Local Storage
         function saveToLocalStorage() {
-            localStorage.setItem('sotutrasm_data', JSON.stringify(state));
-        }
-
-        function loadFromLocalStorage() {
-            const saved = localStorage.getItem('sotutrasm_data');
-            if (saved) {
-                const parsed = JSON.parse(saved);
-                state = { ...state, ...parsed };
-                
-                if (state.selectedDredge) {
-                    state.currentDredge = state.selectedDredge === 'blue-shark' ? 'Blue Shark' : 'White Shark';
-                    document.getElementById('currentDredge').innerHTML = `
-                        <strong>${state.currentDredge}</strong>
-                    `;
+            // Don't save timer state
+            const saveState = {
+                ...state,
+                timer: {
+                    running: false,
+                    startTime: null,
+                    elapsedTime: 0,
+                    interval: null
                 }
-            }
+            };
+            localStorage.setItem('sotutrasm_data', JSON.stringify(saveState));
         }
     </script>
 </body>
