@@ -5,6 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>SOTUTRASM - Suivi Dredging</title>
     
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="icon-192x192.png" sizes="192x192">
+    <link rel="icon" type="image/png" href="icon-512x512.png" sizes="512x512">
+    <link rel="apple-touch-icon" href="icon-192x192.png">
+    
+    <!-- Theme Color -->
+    <meta name="theme-color" content="#2563eb">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="SOTUTRASM">
+    
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -37,74 +51,8 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-/* PWA Styles */
-.pwa-mode .header {
-  padding-top: env(safe-area-inset-top, 16px);
-}
-
-@media (display-mode: standalone) {
-  .nav-tabs {
-    top: calc(72px + env(safe-area-inset-top, 0px));
-  }
-}
-
-/* Installation Button */
-.install-btn {
-  position: fixed;
-  bottom: 100px;
-  right: 20px;
-  z-index: 1000;
-  background: linear-gradient(135deg, var(--primary), var(--primary-light));
-  color: white;
-  border: none;
-  border-radius: 50px;
-  padding: 15px 25px;
-  font-weight: 600;
-  box-shadow: 0 4px 20px rgba(37, 99, 235, 0.3);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  transition: var(--transition);
-}
-
-.install-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 25px rgba(37, 99, 235, 0.4);
-}
-
-/* Offline Indicator */
-.offline-indicator {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  background-color: var(--warning);
-  color: white;
-  text-align: center;
-  padding: 8px;
-  font-size: 14px;
-  z-index: 10000;
-  display: none;
-}
-
-.offline-indicator.show {
-  display: block;
-}
         }
-        <!-- PWA Manifest -->
-<link rel="manifest" href="manifest.json">
-
-<!-- Favicon -->
-<link rel="icon" type="image/png" href="icon-192x192.png" sizes="192x192">
-<link rel="icon" type="image/png" href="icon-512x512.png" sizes="512x512">
-<link rel="apple-touch-icon" href="icon-192x192.png">
-
-<!-- Theme Color -->
-<meta name="theme-color" content="#2563eb">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="SOTUTRASM">
+        
         body {
             font-family: 'Inter', sans-serif;
             background-color: var(--light-gray);
@@ -130,6 +78,10 @@
             position: sticky;
             top: 0;
             z-index: 100;
+        }
+        
+        .pwa-mode .header {
+            padding-top: calc(16px + env(safe-area-inset-top, 0px));
         }
         
         .header-content {
@@ -193,6 +145,12 @@
             position: sticky;
             top: 72px;
             z-index: 99;
+        }
+        
+        @media (display-mode: standalone) {
+            .nav-tabs {
+                top: calc(72px + env(safe-area-inset-top, 0px));
+            }
         }
         
         .nav-tab {
@@ -688,6 +646,51 @@
             font-size: 16px;
         }
         
+        /* PWA Installation Button */
+        .install-btn {
+            position: fixed;
+            bottom: 100px;
+            right: 20px;
+            z-index: 1000;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 15px 25px;
+            font-weight: 600;
+            box-shadow: 0 4px 20px rgba(37, 99, 235, 0.3);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: var(--transition);
+            display: none;
+        }
+        
+        .install-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(37, 99, 235, 0.4);
+        }
+        
+        /* Offline Indicator */
+        .offline-indicator {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: var(--warning);
+            color: white;
+            text-align: center;
+            padding: 8px;
+            font-size: 14px;
+            z-index: 10000;
+            display: none;
+        }
+        
+        .offline-indicator.show {
+            display: block;
+        }
+        
         /* Utility Classes */
         .text-center { text-align: center; }
         .mt-1 { margin-top: 4px; }
@@ -840,6 +843,16 @@
     </style>
 </head>
 <body>
+    <!-- Offline Indicator -->
+    <div id="offlineIndicator" class="offline-indicator">
+        <i class="fas fa-wifi-slash"></i> Mode hors ligne - Les données seront synchronisées lorsque la connexion sera rétablie
+    </div>
+
+    <!-- PWA Installation Button -->
+    <button id="installButton" class="install-btn">
+        <i class="fas fa-download"></i> Installer
+    </button>
+
     <!-- Header -->
     <header class="header">
         <div class="header-content container">
@@ -1224,6 +1237,10 @@
             lastSync: null
         };
 
+        // PWA Variables
+        let deferredPrompt;
+        let isAppInstalled = false;
+
         // Initialize the application
         document.addEventListener('DOMContentLoaded', function() {
             // Load from localStorage
@@ -1240,23 +1257,117 @@
             // Auto-save every 30 seconds
             setInterval(saveToLocalStorage, 30000);
             
+            // Initialize PWA
+            initPWA();
+            
             // Check if dredge is already selected
             if (state.selectedDredge) {
                 showMainApp();
             }
         });
 
+        // Initialize PWA
+        function initPWA() {
+            // Register Service Worker
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('service-worker.js')
+                        .then(registration => {
+                            console.log('Service Worker enregistré avec succès:', registration);
+                            
+                            // Check for updates
+                            registration.addEventListener('updatefound', () => {
+                                const newWorker = registration.installing;
+                                console.log('Nouveau Service Worker trouvé:', newWorker);
+                                
+                                newWorker.addEventListener('statechange', () => {
+                                    if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                        showNotification('Nouvelle version disponible. Rechargez la page.', 'info');
+                                    }
+                                });
+                            });
+                        })
+                        .catch(error => {
+                            console.log('Erreur lors de l\'enregistrement du Service Worker:', error);
+                        });
+                });
+            }
+            
+            // Check if app is running in standalone mode
+            if (isRunningStandalone()) {
+                document.body.classList.add('pwa-mode');
+                isAppInstalled = true;
+            }
+            
+            // Listen for beforeinstallprompt event
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+                showInstallButton();
+            });
+            
+            // Listen for app installed event
+            window.addEventListener('appinstalled', () => {
+                console.log('Application installée avec succès');
+                isAppInstalled = true;
+                document.getElementById('installButton').style.display = 'none';
+                showNotification('Application installée avec succès!');
+            });
+        }
+
+        // Show install button
+        function showInstallButton() {
+            const installBtn = document.getElementById('installButton');
+            if (!isAppInstalled && deferredPrompt) {
+                installBtn.style.display = 'flex';
+                installBtn.onclick = installApp;
+            }
+        }
+
+        // Install app
+        function installApp() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('Utilisateur a accepté l\'installation');
+                        showNotification('Installation en cours...', 'info');
+                    }
+                    deferredPrompt = null;
+                });
+            }
+        }
+
+        // Check if app is running in standalone mode
+        function isRunningStandalone() {
+            return window.matchMedia('(display-mode: standalone)').matches || 
+                   window.navigator.standalone === true ||
+                   document.referrer.includes('android-app://');
+        }
+
         // Monitor internet connection
         function monitorConnection() {
             const connectionStatus = document.getElementById('connectionStatus');
+            const offlineIndicator = document.getElementById('offlineIndicator');
             
             function updateConnectionStatus() {
                 if (navigator.onLine) {
                     connectionStatus.innerHTML = '<i class="fas fa-wifi"></i><span>Connecté</span>';
                     connectionStatus.classList.remove('offline');
+                    offlineIndicator.classList.remove('show');
+                    
+                    // Try to sync if we haven't synced in a while
+                    if (state.lastSync) {
+                        const timeSinceSync = Date.now() - new Date(state.lastSync).getTime();
+                        if (timeSinceSync > 300000) { // 5 minutes
+                            syncData();
+                        }
+                    }
                 } else {
                     connectionStatus.innerHTML = '<i class="fas fa-wifi-slash"></i><span>Hors ligne</span>';
                     connectionStatus.classList.add('offline');
+                    offlineIndicator.classList.add('show');
                 }
             }
             
@@ -1273,8 +1384,33 @@
             setTimeout(() => {
                 state.lastSync = new Date().toISOString();
                 saveToLocalStorage();
+                
+                // Try to sync pending data if any
+                syncPendingData();
+                
                 showNotification('Données synchronisées avec succès');
             }, 1000);
+        }
+
+        // Sync pending data
+        function syncPendingData() {
+            const pendingData = JSON.parse(localStorage.getItem('pendingData') || '[]');
+            if (pendingData.length > 0) {
+                // Simulate sending to server
+                console.log('Syncing pending data:', pendingData.length, 'items');
+                
+                // Clear pending data after successful sync
+                localStorage.removeItem('pendingData');
+                showNotification(`${pendingData.length} données en attente synchronisées`);
+            }
+        }
+
+        // Save pending data for offline use
+        function savePendingData(data) {
+            const pending = JSON.parse(localStorage.getItem('pendingData') || '[]');
+            pending.push(data);
+            localStorage.setItem('pendingData', JSON.stringify(pending));
+            console.log('Data saved for offline sync:', data);
         }
 
         // Dredge Selection
@@ -1438,15 +1574,27 @@
             // Update daily volume
             state.dailyData.volume += parseFloat(volume);
             
-            // Add to operations
-            state.operations.push({
+            // Create operation data
+            const operationData = {
                 date: new Date().toISOString(),
                 dimensions: { length, width, depth },
                 volume: parseFloat(volume),
                 fuelConsumed: fuel,
                 driver: document.getElementById('driverName').value,
                 team: document.getElementById('teamMembers').value
-            });
+            };
+            
+            // If offline, save to pending data
+            if (!navigator.onLine) {
+                savePendingData({
+                    type: 'operation',
+                    data: operationData
+                });
+                showNotification('Opération sauvegardée localement (hors ligne)', 'info');
+            }
+            
+            // Add to operations
+            state.operations.push(operationData);
             
             // Clear form
             document.getElementById('length').value = '';
@@ -1456,7 +1604,10 @@
             
             updateDashboard();
             saveToLocalStorage();
-            showNotification('Opération enregistrée avec succès');
+            
+            if (navigator.onLine) {
+                showNotification('Opération enregistrée avec succès');
+            }
         }
 
         // Reset Data Functions
