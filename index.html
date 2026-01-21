@@ -2,713 +2,198 @@
 <html lang="fr" dir="ltr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#0f172a">
-    <title>SOTUTRASM - Smart Manager V8.0</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SOTUTRASM - Gestion de Dredging</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body { 
-            font-family: 'Poppins', sans-serif; 
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            color: #e2e8f0;
-            min-height: 100vh;
-        }
-        
-        /* Panel Design */
-        .glass-panel {
-            background: rgba(30, 41, 59, 0.9);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
-            padding: 20px;
-            transition: all 0.3s ease;
-        }
-        
-        /* Input Design */
-        .smart-input {
-            width: 100%;
-            padding: 12px 16px;
-            border-radius: 10px;
-            border: 2px solid #334155;
-            background: #1e293b;
-            color: white;
-            font-size: 16px;
-            outline: none;
-            transition: all 0.3s;
-        }
-        
-        .smart-input:focus {
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
-        }
-        
-        /* Logo */
-        .logo {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(135deg, #dc2626 0%, #1d4ed8 100%);
-            border-radius: 12px;
-            margin-bottom: 10px;
-        }
-        
-        /* Button Styles */
-        .btn-primary {
-            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-            color: white;
-            border: none;
-            padding: 14px 24px;
-            border-radius: 12px;
-            font-weight: 600;
-            font-size: 16px;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            width: 100%;
-        }
-        
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
-        }
-        
-        .btn-primary:active {
-            transform: translateY(0);
-        }
-        
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 12px 20px;
-            border-radius: 12px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.15);
-        }
-        
-        /* Card Styles */
-        .stat-card {
-            background: rgba(30, 41, 59, 0.8);
-            border-radius: 16px;
-            padding: 20px;
-            border-left: 4px solid #3b82f6;
-        }
-        
-        .stat-card h3 {
-            font-size: 28px;
-            font-weight: 700;
-            margin: 5px 0;
-        }
-        
-        .stat-card p {
-            color: #94a3b8;
-            font-size: 14px;
-            font-weight: 500;
-        }
-        
-        /* Tab Navigation */
-        .tabs {
-            display: flex;
-            gap: 5px;
-            background: rgba(30, 41, 59, 0.8);
-            padding: 5px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-        }
-        
-        .tab {
-            flex: 1;
-            padding: 12px;
-            text-align: center;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: all 0.3s;
-            color: #94a3b8;
-        }
-        
-        .tab.active {
-            background: #3b82f6;
-            color: white;
-        }
-        
-        /* Hide/Show Views */
-        .view {
-            display: none;
-        }
-        
-        .view.active {
-            display: block;
-        }
-        
-        /* Mobile Responsive */
-        @media (max-width: 768px) {
-            .container {
-                padding: 15px;
-            }
-            
-            .stat-card h3 {
-                font-size: 24px;
-            }
-            
-            .tabs {
-                overflow-x: auto;
-                -webkit-overflow-scrolling: touch;
-            }
-            
-            .tab {
-                white-space: nowrap;
-                min-width: 100px;
-            }
-        }
-        
-        /* Animations */
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        .fade-in {
-            animation: fadeIn 0.3s ease-out;
-        }
-        
-        /* Scrollbar */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: rgba(30, 41, 59, 0.5);
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: #3b82f6;
-            border-radius: 3px;
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #F8FAFC; color: #1E293B; }
+        .card { background: white; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03); border: 1px solid #E2E8F0; }
+        .tab-active { color: #2563EB; border-bottom: 3px solid #2563EB; font-weight: 700; }
+        .input-smart { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #CBD5E1; background: #FFFFFF; outline: none; }
+        .input-smart:focus { border-color: #2563EB; ring: 2px ring-blue-100; }
     </style>
 </head>
-<body>
-    <!-- Login Screen -->
-    <div id="login-screen" class="min-h-screen flex items-center justify-center p-4">
-        <div class="glass-panel w-full max-w-md">
-            <div class="text-center mb-8">
-                <div class="logo mx-auto">
-                    <i class="fas fa-cog text-white text-xl"></i>
-                </div>
-                <h1 class="text-2xl font-bold text-white mt-3">SOTUTRASM</h1>
-                <p class="text-blue-400 text-sm font-medium mt-1">Smart Manager V8.0</p>
-            </div>
-            
-            <div class="space-y-5">
-                <div>
-                    <label class="block text-sm font-medium text-slate-300 mb-2">
-                        <i class="fas fa-envelope mr-2"></i>Email
-                    </label>
-                    <input type="email" id="email" class="smart-input" placeholder="votre@email.com" value="admin@sotutrasm.com">
-                </div>
-                
-                <div>
-                    <label class="block text-sm font-medium text-slate-300 mb-2">
-                        <i class="fas fa-lock mr-2"></i>Mot de passe
-                    </label>
-                    <input type="password" id="password" class="smart-input" placeholder="••••••••" value="admin123">
-                </div>
-                
-                <button onclick="login()" class="btn-primary">
-                    <i class="fas fa-sign-in-alt"></i>
-                    Se Connecter
-                </button>
-            </div>
-            
-            <div class="mt-6 text-center text-xs text-slate-400">
-                <p>Système de Gestion Intelligent</p>
-            </div>
+<body class="pb-24">
+
+    <div id="view-selection" class="min-h-screen flex flex-col items-center justify-center p-6 bg-white">
+        <div class="text-center mb-10">
+            <h1 class="text-3xl font-extrabold text-blue-600 tracking-tight">SOTUTRASM</h1>
+            <p class="text-slate-500 font-medium">Sélectionnez votre unité de travail</p>
         </div>
-    </div>
-    
-    <!-- Main App -->
-    <div id="app" class="hidden min-h-screen">
-        <!-- Header -->
-        <header class="glass-panel mx-4 mt-4 mb-6">
-            <div class="flex justify-between items-center">
-                <div class="flex items-center gap-3">
-                    <div class="logo">
-                        <i class="fas fa-cog text-white"></i>
-                    </div>
-                    <div>
-                        <h1 class="text-lg font-bold text-white" id="page-title">Tableau de Bord</h1>
-                        <p class="text-xs text-slate-400">Bonjour, <span id="username">Admin</span></p>
-                    </div>
-                </div>
-                
-                <button onclick="logout()" class="btn-secondary text-sm">
-                    <i class="fas fa-sign-out-alt"></i>
-                </button>
-            </div>
-        </header>
-        
-        <!-- Main Content -->
-        <main class="container mx-auto px-4 pb-20">
-            <!-- Tabs Navigation -->
-            <div class="tabs">
-                <div class="tab active" onclick="showTab('dashboard')">
-                    <i class="fas fa-home"></i>
-                    <span class="ml-2">Dashboard</span>
-                </div>
-                <div class="tab" onclick="showTab('reports')">
-                    <i class="fas fa-chart-bar"></i>
-                    <span class="ml-2">Rapports</span>
-                </div>
-                <div class="tab" onclick="showTab('settings')">
-                    <i class="fas fa-cog"></i>
-                    <span class="ml-2">Paramètres</span>
-                </div>
-            </div>
-            
-            <!-- Dashboard Tab -->
-            <div id="dashboard-tab" class="view active fade-in">
-                <!-- Stats Cards -->
-                <div class="grid grid-cols-2 gap-4 mb-6">
-                    <div class="stat-card">
-                        <p>Volume Total</p>
-                        <h3>1,250 m³</h3>
-                        <p class="text-green-500 text-xs">
-                            <i class="fas fa-arrow-up"></i> +5.2%
-                        </p>
-                    </div>
-                    
-                    <div class="stat-card" style="border-left-color: #10b981;">
-                        <p>Carburant</p>
-                        <h3>450 L</h3>
-                        <p class="text-red-500 text-xs">
-                            <i class="fas fa-arrow-down"></i> -2.1%
-                        </p>
-                    </div>
-                </div>
-                
-                <!-- Quick Actions -->
-                <div class="glass-panel mb-6">
-                    <h2 class="text-lg font-bold text-white mb-4">Actions Rapides</h2>
-                    <div class="grid grid-cols-2 gap-3">
-                        <button onclick="createReport()" class="btn-secondary flex items-center justify-center gap-2">
-                            <i class="fas fa-plus"></i>
-                            Nouveau Rapport
-                        </button>
-                        <button onclick="showAlert()" class="btn-secondary flex items-center justify-center gap-2">
-                            <i class="fas fa-bell"></i>
-                            Alertes (3)
-                        </button>
-                    </div>
-                </div>
-                
-                <!-- Recent Activities -->
-                <div class="glass-panel">
-                    <h2 class="text-lg font-bold text-white mb-4">Activités Récentes</h2>
-                    <div class="space-y-3">
-                        <div class="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg">
-                            <div>
-                                <p class="text-white font-medium">Pompage Station A</p>
-                                <p class="text-slate-400 text-sm">150 m³ • Aujourd'hui</p>
-                            </div>
-                            <span class="px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-xs">
-                                Terminé
-                            </span>
-                        </div>
-                        
-                        <div class="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg">
-                            <div>
-                                <p class="text-white font-medium">Maintenance Station B</p>
-                                <p class="text-slate-400 text-sm">En cours • Hier</p>
-                            </div>
-                            <span class="px-3 py-1 bg-yellow-500/20 text-yellow-400 rounded-full text-xs">
-                                En cours
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Reports Tab -->
-            <div id="reports-tab" class="view fade-in">
-                <div class="glass-panel mb-4">
-                    <div class="flex justify-between items-center mb-4">
-                        <h2 class="text-lg font-bold text-white">Rapports</h2>
-                        <button onclick="createReport()" class="btn-primary py-2 px-4 text-sm">
-                            <i class="fas fa-plus"></i> Nouveau
-                        </button>
-                    </div>
-                    
-                    <div class="space-y-3">
-                        <div class="p-4 bg-slate-800/50 rounded-lg">
-                            <div class="flex justify-between items-start mb-2">
-                                <h3 class="text-white font-medium">Rapport Mensuel Janvier</h3>
-                                <span class="px-2 py-1 bg-green-500/20 text-green-400 rounded text-xs">
-                                    Complet
-                                </span>
-                            </div>
-                            <p class="text-slate-400 text-sm mb-3">Volume total: 1,250 m³ • Carburant: 450 L</p>
-                            <div class="flex gap-2">
-                                <button class="text-blue-400 text-sm">
-                                    <i class="fas fa-eye"></i> Voir
-                                </button>
-                                <button class="text-green-400 text-sm">
-                                    <i class="fas fa-download"></i> Télécharger
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <div class="p-4 bg-slate-800/50 rounded-lg">
-                            <div class="flex justify-between items-start mb-2">
-                                <h3 class="text-white font-medium">Rapport Hebdomadaire</h3>
-                                <span class="px-2 py-1 bg-yellow-500/20 text-yellow-400 rounded text-xs">
-                                    En attente
-                                </span>
-                            </div>
-                            <p class="text-slate-400 text-sm mb-3">Volume: 450 m³ • Carburant: 180 L</p>
-                            <div class="flex gap-2">
-                                <button class="text-blue-400 text-sm">
-                                    <i class="fas fa-edit"></i> Modifier
-                                </button>
-                                <button class="text-red-400 text-sm">
-                                    <i class="fas fa-trash"></i> Supprimer
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Settings Tab -->
-            <div id="settings-tab" class="view fade-in">
-                <div class="glass-panel">
-                    <h2 class="text-lg font-bold text-white mb-4">Paramètres</h2>
-                    
-                    <div class="space-y-4">
-                        <!-- Profile Settings -->
-                        <div class="p-4 bg-slate-800/50 rounded-lg">
-                            <h3 class="text-white font-medium mb-3">Profil Utilisateur</h3>
-                            <div class="space-y-3">
-                                <div>
-                                    <label class="block text-sm text-slate-300 mb-1">Nom</label>
-                                    <input type="text" class="smart-input" value="Administrateur">
-                                </div>
-                                <div>
-                                    <label class="block text-sm text-slate-300 mb-1">Email</label>
-                                    <input type="email" class="smart-input" value="admin@sotutrasm.com">
-                                </div>
-                                <button class="btn-primary py-2 text-sm">
-                                    <i class="fas fa-save"></i> Sauvegarder
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <!-- System Settings -->
-                        <div class="p-4 bg-slate-800/50 rounded-lg">
-                            <h3 class="text-white font-medium mb-3">Paramètres Système</h3>
-                            <div class="space-y-3">
-                                <div class="flex items-center justify-between">
-                                    <span class="text-slate-300">Notifications</span>
-                                    <label class="switch">
-                                        <input type="checkbox" checked>
-                                        <span class="slider"></span>
-                                    </label>
-                                </div>
-                                
-                                <div class="flex items-center justify-between">
-                                    <span class="text-slate-300">Mode Sombre</span>
-                                    <label class="switch">
-                                        <input type="checkbox" checked>
-                                        <span class="slider"></span>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- About -->
-                        <div class="p-4 bg-slate-800/50 rounded-lg">
-                            <h3 class="text-white font-medium mb-3">À Propos</h3>
-                            <p class="text-slate-400 text-sm mb-2">
-                                <strong>SOTUTRASM Smart Manager V8.0</strong>
-                            </p>
-                            <p class="text-slate-400 text-sm">
-                                Système de Gestion Intelligent
-                            </p>
-                            <p class="text-slate-400 text-xs mt-3">
-                                © 2024 Tous droits réservés
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </main>
-        
-        <!-- Bottom Navigation (Mobile) -->
-        <nav class="fixed bottom-0 left-0 right-0 glass-panel border-t border-white/10">
-            <div class="flex justify-around items-center py-3">
-                <button onclick="showTab('dashboard')" class="flex flex-col items-center text-blue-400">
-                    <i class="fas fa-home text-lg"></i>
-                    <span class="text-xs mt-1">Dashboard</span>
-                </button>
-                
-                <button onclick="showTab('reports')" class="flex flex-col items-center text-slate-400">
-                    <i class="fas fa-chart-bar text-lg"></i>
-                    <span class="text-xs mt-1">Rapports</span>
-                </button>
-                
-                <button onclick="showTab('settings')" class="flex flex-col items-center text-slate-400">
-                    <i class="fas fa-cog text-lg"></i>
-                    <span class="text-xs mt-1">Paramètres</span>
-                </button>
-            </div>
-        </nav>
-    </div>
-    
-    <!-- Alert Modal -->
-    <div id="alert-modal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-        <div class="glass-panel max-w-md w-full">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-bold text-white">Alertes Système</h3>
-                <button onclick="closeAlert()" class="text-slate-400 hover:text-white">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            
-            <div class="space-y-3">
-                <div class="p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
-                    <div class="flex items-start gap-3">
-                        <i class="fas fa-exclamation-triangle text-red-400 mt-1"></i>
-                        <div>
-                            <p class="text-white font-medium">Carburant bas</p>
-                            <p class="text-slate-400 text-sm">Station Est - Niveau critique</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
-                    <div class="flex items-start gap-3">
-                        <i class="fas fa-tools text-yellow-400 mt-1"></i>
-                        <div>
-                            <p class="text-white font-medium">Maintenance requise</p>
-                            <p class="text-slate-400 text-sm">Station Ouest - Demain 10:00</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <button onclick="closeAlert()" class="btn-primary mt-4">
-                <i class="fas fa-check"></i> Compris
+        <div class="grid grid-cols-1 gap-6 w-full max-w-sm">
+            <button onclick="selectDrague('Blue Shark')" class="card p-8 hover:border-blue-500 transition-all text-center group">
+                <i class="fas fa-ship text-4xl text-blue-600 mb-4 group-hover:scale-110 transition"></i>
+                <h2 class="text-xl font-bold text-slate-800">Blue Shark</h2>
+            </button>
+            <button onclick="selectDrague('White Shark')" class="card p-8 hover:border-blue-500 transition-all text-center group">
+                <i class="fas fa-anchor text-4xl text-slate-400 mb-4 group-hover:scale-110 transition"></i>
+                <h2 class="text-xl font-bold text-slate-800">White Shark</h2>
             </button>
         </div>
     </div>
 
+    <div id="main-app" class="hidden">
+        <nav class="bg-white border-b border-slate-200 sticky top-0 z-50 p-4">
+            <div class="flex justify-between items-center max-w-lg mx-auto">
+                <div>
+                    <span id="display-drague" class="text-xs font-bold text-blue-600 uppercase tracking-widest">DRAGUE</span>
+                    <h1 class="font-extrabold text-lg">SOTUTRASM</h1>
+                </div>
+                <div id="timer-display" class="bg-blue-50 text-blue-700 px-4 py-1.5 rounded-full font-mono font-bold border border-blue-100">
+                    00:00:00
+                </div>
+            </div>
+            <div class="flex justify-between mt-4 max-w-lg mx-auto overflow-x-auto text-sm font-semibold text-slate-500">
+                <button onclick="showTab('ops')" id="tab-ops" class="px-3 pb-2 tab-active">Opérations</button>
+                <button onclick="showTab('engines')" id="tab-engines" class="px-3 pb-2">Moteurs</button>
+                <button onclick="showTab('fuel')" id="tab-fuel" class="px-3 pb-2">Carburant</button>
+                <button onclick="showTab('reports')" id="tab-reports" class="px-3 pb-2">Rapports</button>
+            </div>
+        </nav>
+
+        <main class="p-4 max-w-lg mx-auto">
+            <section id="view-ops" class="tab-content space-y-6">
+                <div class="flex gap-2">
+                    <button onclick="startTimer()" id="btn-start" class="flex-1 bg-green-600 text-white p-4 rounded-2xl font-bold shadow-lg shadow-green-100 hover:bg-green-700"><i class="fas fa-play mr-2"></i>Start</button>
+                    <button onclick="stopTimer()" class="flex-1 bg-red-600 text-white p-4 rounded-2xl font-bold shadow-lg shadow-red-100 hover:bg-red-700"><i class="fas fa-stop mr-2"></i>Stop</button>
+                </div>
+
+                <div class="card p-5 space-y-4">
+                    <h3 class="font-bold border-b pb-2 text-slate-700">Données du Chantier</h3>
+                    <input type="text" id="chauffeur" class="input-smart" placeholder="Nom du chauffeur">
+                    <div class="grid grid-cols-3 gap-2">
+                        <input type="number" id="long" class="input-smart text-center" placeholder="L">
+                        <input type="number" id="larg" class="input-smart text-center" placeholder="l">
+                        <input type="number" id="prof" class="input-smart text-center" placeholder="P">
+                    </div>
+                    <button onclick="saveOps()" class="w-full bg-blue-600 text-white py-4 rounded-xl font-bold shadow-lg shadow-blue-100">Enregistrer l'opération</button>
+                </div>
+            </section>
+
+            <section id="view-engines" class="tab-content hidden space-y-4">
+                <div id="engine-list" class="space-y-4">
+                    </div>
+            </section>
+
+            <section id="view-fuel" class="tab-content hidden space-y-4 text-center">
+                <div class="card p-6 bg-blue-600 text-white">
+                    <p class="text-sm opacity-80 uppercase font-bold tracking-tighter">Stock Total Disponible</p>
+                    <h2 class="text-4xl font-black mt-1" id="stock-fuel">0 <small class="text-lg">L</small></h2>
+                </div>
+                <div class="card p-5 text-left">
+                    <h3 class="font-bold mb-4">Ravitaillement</h3>
+                    <input type="number" id="fuel-input" class="input-smart" placeholder="Quantité en Litres">
+                    <button onclick="updateFuel()" class="w-full bg-slate-800 text-white py-4 rounded-xl mt-4 font-bold">Mettre à jour le stock</button>
+                </div>
+            </section>
+
+            <section id="view-reports" class="tab-content hidden text-center py-10">
+                <div class="card p-8">
+                    <i class="fas fa-file-pdf text-5xl text-blue-200 mb-4"></i>
+                    <h3 class="text-lg font-bold">Exportation PDF</h3>
+                    <p class="text-sm text-slate-500 mb-6">Générez un rapport complet des activités hebdomadaires.</p>
+                    <button onclick="window.print()" class="w-full bg-slate-100 border border-slate-300 py-3 rounded-xl font-bold text-slate-700">Imprimer le rapport</button>
+                </div>
+            </section>
+        </main>
+    </div>
+
     <script>
-        // Initialize the app
-        document.addEventListener('DOMContentLoaded', function() {
-            // Check if user is already logged in
-            if (localStorage.getItem('sotutrasm_logged') === 'true') {
-                showApp();
-            }
-        });
-        
-        // Login function
-        function login() {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            
-            // Simple validation
-            if (email === 'admin@sotutrasm.com' && password === 'admin123') {
-                // Save login state
-                localStorage.setItem('sotutrasm_logged', 'true');
-                localStorage.setItem('sotutrasm_user', 'Admin');
-                
-                // Show main app
-                showApp();
-            } else {
-                alert('Email ou mot de passe incorrect!');
-            }
+        // FIREBASE CONFIG
+        const firebaseConfig = {
+            apiKey: "AIzaSyBJxyFwFseINtXqdEU0JYESl6zQYVj0hSw",
+            authDomain: "sotutrasm-manager.firebaseapp.com",
+            projectId: "sotutrasm-manager",
+            storageBucket: "sotutrasm-manager.firebasestorage.app",
+            messagingSenderId: "452756329466",
+            appId: "1:452756329466:web:8c5b54a2818e4602874a43"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        let currentDrague = "";
+        let timer = null;
+        let seconds = 0;
+
+        function selectDrague(name) {
+            currentDrague = name;
+            document.getElementById('view-selection').classList.add('hidden');
+            document.getElementById('main-app').classList.remove('hidden');
+            document.getElementById('display-drague').innerText = name;
+            initEngines();
+            loadFuel();
         }
-        
-        // Logout function
-        function logout() {
-            if (confirm('Voulez-vous vous déconnecter?')) {
-                localStorage.removeItem('sotutrasm_logged');
-                localStorage.removeItem('sotutrasm_user');
-                hideApp();
-            }
+
+        function showTab(id) {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+            document.querySelectorAll('nav button').forEach(b => b.classList.remove('tab-active'));
+            document.getElementById('view-' + id).classList.remove('hidden');
+            document.getElementById('tab-' + id).classList.add('tab-active');
         }
-        
-        // Show main app
-        function showApp() {
-            document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('app').style.display = 'block';
-            
-            // Set username
-            const user = localStorage.getItem('sotutrasm_user') || 'Admin';
-            document.getElementById('username').textContent = user;
+
+        function startTimer() {
+            if (timer) return;
+            timer = setInterval(() => {
+                seconds++;
+                let h = Math.floor(seconds/3600).toString().padStart(2,'0');
+                let m = Math.floor((seconds%3600)/60).toString().padStart(2,'0');
+                let s = (seconds%60).toString().padStart(2,'0');
+                document.getElementById('timer-display').innerText = `${h}:${m}:${s}`;
+            }, 1000);
+            document.getElementById('btn-start').classList.add('opacity-50');
         }
-        
-        // Hide main app (show login)
-        function hideApp() {
-            document.getElementById('login-screen').style.display = 'flex';
-            document.getElementById('app').style.display = 'none';
+
+        function stopTimer() {
+            clearInterval(timer);
+            timer = null;
+            document.getElementById('btn-start').classList.remove('opacity-50');
+            alert("Temps enregistré: " + document.getElementById('timer-display').innerText);
         }
-        
-        // Tab navigation
-        function showTab(tabName) {
-            // Hide all tabs
-            document.querySelectorAll('.view').forEach(tab => {
-                tab.classList.remove('active');
+
+        function initEngines() {
+            const list = document.getElementById('engine-list');
+            const engines = currentDrague === "Blue Shark" ? ["CAT C32", "CAT 3406", "IVECO"] : ["CAT 3512"];
+            list.innerHTML = engines.map(e => `
+                <div class="card p-5">
+                    <h4 class="font-black text-blue-700 mb-4">${e}</h4>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <p class="text-[10px] uppercase font-bold text-slate-400">Heures Moteur</p>
+                            <input type="number" class="w-full text-lg font-bold border-b py-1 outline-none" placeholder="00.0">
+                        </div>
+                        <button class="bg-blue-50 text-blue-600 rounded-xl text-xs font-bold py-2 border border-blue-100">Action Vidange</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateFuel() {
+            const val = document.getElementById('fuel-input').value;
+            if(!val) return;
+            db.collection("fuel").add({
+                drague: currentDrague,
+                quantite: parseFloat(val),
+                ts: firebase.firestore.FieldValue.serverTimestamp()
+            }).then(() => {
+                document.getElementById('fuel-input').value = "";
+                loadFuel();
             });
-            
-            // Remove active class from all tab buttons
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.classList.remove('active');
+        }
+
+        function loadFuel() {
+            db.collection("fuel").onSnapshot(snap => {
+                let total = 0;
+                snap.forEach(doc => total += doc.data().quantite);
+                document.getElementById('stock-fuel').innerText = total + " L";
             });
-            
-            // Remove active class from all mobile nav buttons
-            document.querySelectorAll('nav button').forEach(btn => {
-                btn.classList.remove('text-blue-400');
-                btn.classList.add('text-slate-400');
-            });
-            
-            // Show selected tab
-            document.getElementById(`${tabName}-tab`).classList.add('active');
-            
-            // Set page title
-            const titles = {
-                'dashboard': 'Tableau de Bord',
-                'reports': 'Rapports',
-                'settings': 'Paramètres'
-            };
-            document.getElementById('page-title').textContent = titles[tabName];
-            
-            // Update tab button
-            document.querySelectorAll('.tab').forEach(tab => {
-                if (tab.textContent.includes(titles[tabName])) {
-                    tab.classList.add('active');
-                }
-            });
-            
-            // Update mobile navigation
-            const mobileBtns = document.querySelectorAll('nav button');
-            if (tabName === 'dashboard') {
-                mobileBtns[0].classList.add('text-blue-400');
-                mobileBtns[0].classList.remove('text-slate-400');
-            } else if (tabName === 'reports') {
-                mobileBtns[1].classList.add('text-blue-400');
-                mobileBtns[1].classList.remove('text-slate-400');
-            } else if (tabName === 'settings') {
-                mobileBtns[2].classList.add('text-blue-400');
-                mobileBtns[2].classList.remove('text-slate-400');
-            }
         }
-        
-        // Alert modal functions
-        function showAlert() {
-            document.getElementById('alert-modal').style.display = 'flex';
-        }
-        
-        function closeAlert() {
-            document.getElementById('alert-modal').style.display = 'none';
-        }
-        
-        // Create report function
-        function createReport() {
-            alert('Fonction de création de rapport bientôt disponible!');
-            // You can add more functionality here
-        }
-        
-        // Toggle switch style
-        const style = document.createElement('style');
-        style.textContent = `
-            .switch {
-                position: relative;
-                display: inline-block;
-                width: 50px;
-                height: 24px;
-            }
-            
-            .switch input {
-                opacity: 0;
-                width: 0;
-                height: 0;
-            }
-            
-            .slider {
-                position: absolute;
-                cursor: pointer;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background-color: #475569;
-                transition: .3s;
-                border-radius: 34px;
-            }
-            
-            .slider:before {
-                position: absolute;
-                content: "";
-                height: 16px;
-                width: 16px;
-                left: 4px;
-                bottom: 4px;
-                background-color: white;
-                transition: .3s;
-                border-radius: 50%;
-            }
-            
-            input:checked + .slider {
-                background-color: #3b82f6;
-            }
-            
-            input:checked + .slider:before {
-                transform: translateX(26px);
-            }
-        `;
-        document.head.appendChild(style);
-        
-        // Close alert when clicking outside
-        document.getElementById('alert-modal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeAlert();
-            }
-        });
-        
-        // Add keyboard shortcuts
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                closeAlert();
-            }
-        });
     </script>
 </body>
 </html>
