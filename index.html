@@ -11,84 +11,83 @@
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
-
+    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap');
-        :root { --primary: #0f172a; --accent: #2563eb; }
-        body { font-family: 'Poppins', sans-serif; background-color: #0f172a; color: #e2e8f0; margin: 0; overflow-x: hidden; }
+        body { font-family: 'Poppins', sans-serif; background-color: #0f172a; color: #e2e8f0; margin: 0; }
         .glass-panel { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); }
-        .btn-smart { background: linear-gradient(135deg, #2563eb, #1d4ed8); transition: all 0.3s ease; }
-        .btn-smart:active { transform: scale(0.95); }
-        
-        /* Logo SOTUTRASM */
-        .logo-container { position: relative; width: 60px; height: 60px; margin: 0 auto; }
-        .logo-shape-t-top { position: absolute; top: 8px; left: 4px; right: 8px; height: 15px; background: linear-gradient(to right, #dc2626, #b91c1c); transform: skewX(-10deg); border-radius: 2px; }
-        .logo-shape-t-stem { position: absolute; top: 12px; left: 26px; width: 15px; height: 40px; background: linear-gradient(to bottom, #1d4ed8, #1e40af); transform: skewX(-10deg); border-radius: 2px; }
+        .tab-active { color: #2563eb; border-bottom: 3px solid #2563eb; }
+        .logo-container { position: relative; width: 50px; height: 50px; }
+        .logo-shape-t-top { position: absolute; top: 8px; left: 4px; right: 8px; height: 12px; background: linear-gradient(to right, #dc2626, #b91c1c); transform: skewX(-10deg); border-radius: 2px; }
+        .logo-shape-t-stem { position: absolute; top: 12px; left: 22px; width: 12px; height: 32px; background: linear-gradient(to bottom, #1d4ed8, #1e40af); transform: skewX(-10deg); border-radius: 2px; }
     </style>
 </head>
-<body>
+<body class="pb-24">
 
-    <div id="view-login" class="min-h-screen flex items-center justify-center p-6 bg-[#0f172a]">
-        <div class="glass-panel p-8 rounded-[2.5rem] w-full max-w-md shadow-2xl border border-slate-700">
-            <div class="text-center mb-10">
-                <div class="logo-container mb-4"><div class="logo-shape-t-top"></div><div class="logo-shape-t-stem"></div></div>
-                <h1 class="text-3xl font-black tracking-tight">SOTUTRASM</h1>
-                <p class="text-blue-500 text-[10px] font-bold uppercase tracking-widest mt-1">Smart Manager V8.0</p>
+    <nav class="glass-panel sticky top-0 z-50 px-4 pt-4 flex flex-col gap-4">
+        <div class="flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <div class="logo-container scale-75"><div class="logo-shape-t-top"></div><div class="logo-shape-t-stem"></div></div>
+                <h1 class="font-black text-xl tracking-tighter">SOTUTRASM</h1>
             </div>
-            <div class="space-y-4">
-                <input type="email" id="login-email" class="w-full p-4 rounded-2xl bg-slate-900 border border-slate-700" placeholder="Email" value="admin@sotutrasm.com">
-                <input type="password" id="login-password" class="w-full p-4 rounded-2xl bg-slate-900 border border-slate-700" placeholder="Mot de passe" value="admin123">
-                <button onclick="handleLogin()" class="btn-smart w-full py-4 rounded-2xl font-bold shadow-lg shadow-blue-900/40">Se Connecter</button>
+            <div id="smart-timer" class="bg-red-500/20 text-red-500 px-3 py-1 rounded-full text-xs font-mono font-bold border border-red-500/30">
+                00:00:00
             </div>
         </div>
-    </div>
+        
+        <div class="flex justify-between text-xs font-bold uppercase tracking-wider pb-2 overflow-x-auto no-scrollbar">
+            <button onclick="showTab('dashboard')" id="tab-dashboard" class="px-3 pb-2 tab-active transition-all">Dashboard</button>
+            <button onclick="showTab('logs')" id="tab-logs" class="px-3 pb-2 text-slate-500 transition-all">Historique</button>
+            <button onclick="showTab('engines')" id="tab-engines" class="px-3 pb-2 text-slate-500 transition-all">Engins</button>
+            <button onclick="showTab('reports')" id="tab-reports" class="px-3 pb-2 text-slate-500 transition-all">Rapports</button>
+        </div>
+    </nav>
 
-    <div id="view-main" class="hidden min-h-screen pb-24">
-        <nav class="glass-panel sticky top-0 z-50 p-4 flex justify-between items-center">
-            <div class="flex items-center gap-3">
-                <div class="logo-container scale-50 -m-4"><div class="logo-shape-t-top"></div><div class="logo-shape-t-stem"></div></div>
-                <span class="font-bold text-lg">Tableau de Bord</span>
-            </div>
-            <button onclick="location.reload()" class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-red-400"><i class="fas fa-power-off"></i></button>
-        </nav>
-
-        <main class="p-4 space-y-6">
+    <main class="p-4">
+        <section id="view-dashboard" class="tab-content space-y-6">
             <div class="grid grid-cols-2 gap-4">
                 <div class="glass-panel p-5 rounded-3xl border-l-4 border-blue-500">
-                    <p class="text-[10px] uppercase font-bold text-slate-500">Production Totale</p>
-                    <div id="stat-vol" class="text-2xl font-black">0 <small class="text-xs font-normal">m³</small></div>
+                    <p class="text-[10px] uppercase font-bold text-slate-500">Production</p>
+                    <div id="total-vol" class="text-2xl font-black">0 <small class="text-xs font-normal">m³</small></div>
                 </div>
                 <div class="glass-panel p-5 rounded-3xl border-l-4 border-emerald-500">
-                    <p class="text-[10px] uppercase font-bold text-slate-500">Total Gasoil</p>
-                    <div id="stat-gas" class="text-2xl font-black">0 <small class="text-xs font-normal">L</small></div>
+                    <p class="text-[10px] uppercase font-bold text-slate-500">Gasoil</p>
+                    <div id="total-gas" class="text-2xl font-black">0 <small class="text-xs font-normal">L</small></div>
                 </div>
             </div>
 
-            <div class="glass-panel p-4 rounded-3xl h-48 flex items-center justify-center">
-                <canvas id="mainChart"></canvas>
-            </div>
-
-            <div class="glass-panel p-6 rounded-[2rem] shadow-xl">
-                <h3 class="font-bold mb-4 flex items-center gap-2"><i class="fas fa-edit text-blue-500"></i> Nouveau Rapport</h3>
+            <div class="glass-panel p-6 rounded-[2.5rem]">
+                <h3 class="font-bold mb-4 text-sm"><i class="fas fa-plus-circle text-blue-500 mr-2"></i>Saisie Rapide</h3>
                 <div class="space-y-4">
-                    <input type="number" id="inp-vol" class="w-full p-4 rounded-xl bg-slate-900 border border-slate-700" placeholder="Volume m³">
-                    <input type="number" id="inp-gas" class="w-full p-4 rounded-xl bg-slate-900 border border-slate-700" placeholder="Gasoil Litres">
-                    <button onclick="syncData()" id="btn-sync" class="btn-smart w-full py-4 rounded-xl font-bold flex items-center justify-center gap-2">
-                        <i class="fas fa-cloud-upload-alt"></i> Synchroniser au Cloud
+                    <input type="number" id="inp-vol" class="w-full p-4 rounded-2xl bg-slate-900 border border-slate-700" placeholder="Volume m³">
+                    <input type="number" id="inp-gas" class="w-full p-4 rounded-2xl bg-slate-900 border border-slate-700" placeholder="Gasoil L">
+                    <button onclick="syncToCloud()" id="btn-sync" class="w-full bg-blue-600 py-4 rounded-2xl font-bold flex items-center justify-center gap-2">
+                        <i class="fas fa-cloud-upload-alt"></i> Synchroniser
                     </button>
                 </div>
             </div>
+        </section>
 
-            <div>
-                <h3 class="text-xs font-bold text-slate-500 uppercase mb-4 ml-2">Flux d'activités en direct</h3>
-                <div id="logs-list" class="space-y-3">
-                    </div>
+        <section id="view-logs" class="tab-content hidden space-y-4">
+            <h3 class="font-bold text-slate-400 text-xs uppercase ml-2">Flux d'activités</h3>
+            <div id="logs-list" class="space-y-3"></div>
+        </section>
+
+        <section id="view-engines" class="tab-content hidden space-y-4">
+            <div class="glass-panel p-5 rounded-3xl border-l-4 border-yellow-500">
+                <h4 class="font-bold text-sm">Pelle Hydraulique #01</h4>
+                <p class="text-xs text-slate-400 mt-1">Status: <span class="text-green-400">En marche</span></p>
             </div>
-        </main>
-    </div>
+        </section>
+
+        <section id="view-reports" class="tab-content hidden text-center py-10">
+            <i class="fas fa-file-pdf text-4xl text-slate-700 mb-4"></i>
+            <p class="text-slate-500 text-sm">Génération de rapports PDF bientôt disponible.</p>
+        </section>
+    </main>
 
     <script>
+        // CONFIGURATION FIREBASE
         const firebaseConfig = {
             apiKey: "AIzaSyBJxyFwFseINtXqdEU0JYESl6zQYVj0hSw",
             authDomain: "sotutrasm-manager.firebaseapp.com",
@@ -97,24 +96,35 @@
             messagingSenderId: "452756329466",
             appId: "1:452756329466:web:8c5b54a2818e4602874a43"
         };
-
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        function handleLogin() {
-            document.getElementById('view-login').classList.add('hidden');
-            document.getElementById('view-main').classList.remove('hidden');
-            initApp();
+        // TIMER LOGIC
+        let seconds = 0;
+        setInterval(() => {
+            seconds++;
+            let h = Math.floor(seconds / 3600).toString().padStart(2, '0');
+            let m = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
+            let s = (seconds % 60).toString().padStart(2, '0');
+            document.getElementById('smart-timer').innerText = `${h}:${m}:${s}`;
+        }, 1000);
+
+        // TAB NAVIGATION LOGIC
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('nav button').forEach(btn => btn.classList.replace('text-blue-600', 'text-slate-500'));
+            document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('tab-active'));
+            
+            document.getElementById('view-' + tabId).classList.remove('hidden');
+            document.getElementById('tab-' + tabId).classList.add('tab-active');
+            document.getElementById('tab-' + tabId).classList.replace('text-slate-500', 'text-blue-600');
         }
 
-        function syncData() {
+        // SYNC LOGIC
+        function syncToCloud() {
             const v = document.getElementById('inp-vol').value;
             const g = document.getElementById('inp-gas').value;
-            const b = document.getElementById('btn-sync');
-            if(!v || !g) return alert("Champs vides!");
-
-            b.disabled = true;
-            b.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sync...';
+            if(!v || !g) return alert("Remplissez les champs");
 
             db.collection("reports").add({
                 vol: parseFloat(v),
@@ -124,29 +134,27 @@
             }).then(() => {
                 document.getElementById('inp-vol').value = "";
                 document.getElementById('inp-gas').value = "";
-                b.disabled = false;
-                b.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Synchroniser';
+                alert("Synchronisé !");
             });
         }
 
-        function initApp() {
-            db.collection("reports").orderBy("ts", "desc").onSnapshot(snap => {
-                const list = document.getElementById('logs-list');
-                let tv = 0, tg = 0;
-                list.innerHTML = "";
-                snap.forEach(doc => {
-                    const d = doc.data();
-                    tv += d.vol || 0; tg += d.gas || 0;
-                    list.innerHTML += `
-                        <div class="glass-panel p-4 rounded-2xl flex justify-between items-center border-l-2 border-blue-500">
-                            <div><div class="font-black text-blue-400">${d.vol} m³</div><div class="text-[10px] text-emerald-400">${d.gas} L Gasoil</div></div>
-                            <div class="text-[9px] text-slate-500 font-mono">${d.date}</div>
-                        </div>`;
-                });
-                document.getElementById('stat-vol').innerHTML = `${tv.toFixed(1)} <small class="text-xs">m³</small>`;
-                document.getElementById('stat-gas').innerHTML = `${tg.toFixed(1)} <small class="text-xs">L</small>`;
+        // REAL-TIME DATA FETCH
+        db.collection("reports").orderBy("ts", "desc").onSnapshot(snap => {
+            const list = document.getElementById('logs-list');
+            let tv = 0, tg = 0;
+            list.innerHTML = "";
+            snap.forEach(doc => {
+                const d = doc.data();
+                tv += d.vol || 0; tg += d.gas || 0;
+                list.innerHTML += `
+                    <div class="glass-panel p-4 rounded-2xl flex justify-between border-l-2 border-blue-500">
+                        <div><span class="font-bold text-blue-400">${d.vol} m³</span></div>
+                        <div class="text-[10px] text-slate-500">${d.date}</div>
+                    </div>`;
             });
-        }
+            document.getElementById('total-vol').innerHTML = `${tv.toFixed(1)} <small class="text-xs">m³</small>`;
+            document.getElementById('total-gas').innerHTML = `${tg.toFixed(1)} <small class="text-xs">L</small>`;
+        });
     </script>
 </body>
 </html>
