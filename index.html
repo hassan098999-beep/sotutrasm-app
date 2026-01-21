@@ -27,6 +27,11 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    
     <style>
         :root {
             --primary: #2563eb;
@@ -135,6 +140,19 @@
         
         .connection-status i {
             font-size: 10px;
+        }
+        
+        /* User Info */
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            background-color: rgba(37, 99, 235, 0.1);
+            color: var(--primary);
+            font-weight: 500;
         }
         
         /* Navigation Tabs */
@@ -691,6 +709,24 @@
             display: block;
         }
         
+        /* Login Card */
+        .login-card {
+            max-width: 400px;
+            margin: 50px auto;
+        }
+        
+        .login-logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .login-logo .logo-icon {
+            margin: 0 auto 15px;
+            width: 60px;
+            height: 60px;
+            font-size: 24px;
+        }
+        
         /* Utility Classes */
         .text-center { text-align: center; }
         .mt-1 { margin-top: 4px; }
@@ -853,319 +889,404 @@
         <i class="fas fa-download"></i> Installer
     </button>
 
-    <!-- Header -->
-    <header class="header">
-        <div class="header-content container">
-            <div class="logo">
+    <!-- Login Screen -->
+    <div id="loginScreen" class="screen active">
+        <div class="login-card card">
+            <div class="login-logo">
                 <div class="logo-icon">S</div>
                 <div class="logo-text">SOTUTRASM</div>
-            </div>
-            <div id="connectionStatus" class="connection-status">
-                <i class="fas fa-wifi"></i>
-                <span>Connecté</span>
-            </div>
-        </div>
-    </header>
-
-    <!-- Navigation Tabs -->
-    <nav class="nav-tabs">
-        <div class="nav-tab active" onclick="showTab('operations')">
-            <i class="fas fa-tasks"></i>
-            <span>Opérations</span>
-        </div>
-        <div class="nav-tab" onclick="showTab('motors')">
-            <i class="fas fa-cogs"></i>
-            <span>Moteurs</span>
-        </div>
-        <div class="nav-tab" onclick="showTab('fuel')">
-            <i class="fas fa-gas-pump"></i>
-            <span>Carburant</span>
-        </div>
-        <div class="nav-tab" onclick="showTab('reports')">
-            <i class="fas fa-chart-bar"></i>
-            <span>Rapports</span>
-        </div>
-    </nav>
-
-    <!-- Main Content -->
-    <main class="container">
-        <!-- Dredge Selection Screen -->
-        <div id="dredgeSelection" class="screen active">
-            <div class="text-center mt-5 mb-6">
-                <h1 style="font-size: 28px; margin-bottom: 12px; color: var(--primary);">Sélectionnez votre drague</h1>
-                <p style="color: var(--dark-gray); font-size: 16px;">Choisissez la drague pour laquelle vous allez travailler</p>
+                <p style="color: var(--dark-gray); margin-top: 10px;">Connexion requise</p>
             </div>
             
-            <div class="dredge-selection">
-                <div class="dredge-card" onclick="selectDredge('blue-shark')">
-                    <div class="dredge-icon">
-                        <i class="fas fa-ship"></i>
-                    </div>
-                    <div class="dredge-name">Blue Shark</div>
-                    <div class="dredge-info">3 moteurs : CAT C32, CAT 3406, IVECO</div>
-                </div>
-                
-                <div class="dredge-card" onclick="selectDredge('white-shark')">
-                    <div class="dredge-icon">
-                        <i class="fas fa-ship"></i>
-                    </div>
-                    <div class="dredge-name">White Shark</div>
-                    <div class="dredge-info">1 moteur : CAT 3512</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Operations Screen -->
-        <div id="operationsScreen" class="screen">
-            <!-- Header with Dredge Info -->
-            <div class="card mb-4">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <div>
-                        <h3 style="font-size: 20px; font-weight: 700; color: var(--primary);" id="currentDredgeTitle">
-                            Blue Shark
-                        </h3>
-                        <p style="color: var(--dark-gray); font-size: 14px;">Session en cours</p>
-                    </div>
-                    <button class="switch-dredge-btn" onclick="showSwitchDredgeModal()">
-                        <i class="fas fa-exchange-alt"></i>
-                        Changer de drague
-                    </button>
-                </div>
-            </div>
-
-            <!-- Timer Section -->
-            <div class="timer-section">
-                <div class="timer-display" id="timerDisplay">00:00:00</div>
-                <div class="timer-controls">
-                    <button class="btn btn-success" onclick="startTimer()" id="startBtn">
-                        <i class="fas fa-play"></i> Démarrer
-                    </button>
-                    <button class="btn btn-warning" onclick="pauseTimer()" id="pauseBtn" style="display: none;">
-                        <i class="fas fa-pause"></i> Pause
-                    </button>
-                    <button class="btn btn-danger" onclick="stopTimer()">
-                        <i class="fas fa-stop"></i> Arrêter
-                    </button>
-                </div>
-            </div>
-
-            <!-- Driver Info -->
-            <div class="card">
-                <div class="card-title">
-                    <i class="fas fa-user"></i>
-                    Informations de l'équipe
+            <div id="loginForm">
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-input" id="loginEmail" placeholder="votre@email.com">
                 </div>
                 
                 <div class="form-group">
-                    <label class="form-label">Nom du chauffeur</label>
-                    <input type="text" class="form-input" id="driverName" placeholder="Entrez votre nom" value="Jean Dupont">
+                    <label class="form-label">Mot de passe</label>
+                    <input type="password" class="form-input" id="loginPassword" placeholder="Votre mot de passe">
                 </div>
                 
-                <div class="form-group">
-                    <label class="form-label">Équipe accompagnante</label>
-                    <input type="text" class="form-input" id="teamMembers" placeholder="Noms des membres de l'équipe">
-                </div>
-            </div>
-
-            <!-- Operation Details -->
-            <div class="card">
-                <div class="card-title">
-                    <i class="fas fa-ruler-combined"></i>
-                    Dimensions de travail
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Longueur (mètres)</label>
-                    <input type="number" class="form-input" id="length" placeholder="0.00" step="0.1" min="0">
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Largeur (mètres)</label>
-                    <input type="number" class="form-input" id="width" placeholder="0.00" step="0.1" min="0">
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Profondeur (mètres)</label>
-                    <input type="number" class="form-input" id="depth" placeholder="0.00" step="0.1" min="0">
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Carburant consommé (litres)</label>
-                    <input type="number" class="form-input" id="fuelConsumed" placeholder="0" min="0">
-                </div>
-                
-                <button class="btn btn-primary mt-4" onclick="saveOperation()">
-                    <i class="fas fa-save"></i> Enregistrer l'opération
+                <button class="btn btn-primary mt-4" onclick="login()">
+                    <i class="fas fa-sign-in-alt"></i> Se connecter
                 </button>
-            </div>
-
-            <!-- Dashboard -->
-            <div class="card">
-                <div class="card-title">
-                    <i class="fas fa-chart-line"></i>
-                    Dashboard du jour
+                
+                <div class="text-center mt-4">
+                    <p style="color: var(--dark-gray); font-size: 14px;">OU</p>
+                    <button class="btn btn-outline mt-2" onclick="loginAnonymously()">
+                        <i class="fas fa-user-secret"></i> Continuer anonymement
+                    </button>
                 </div>
                 
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-value" id="totalHours">00:00</div>
-                        <div class="stat-label">Heures travaillées</div>
-                    </div>
-                    
-                    <div class="stat-card">
-                        <div class="stat-value" id="totalVolume">0 m³</div>
-                        <div class="stat-label">Volume dredgé</div>
-                    </div>
-                    
-                    <div class="stat-card">
-                        <div class="stat-value" id="totalFuel">0 L</div>
-                        <div class="stat-label">Carburant consommé</div>
-                    </div>
-                    
-                    <div class="stat-card">
-                        <div class="stat-value" id="efficiency">0 L/m³</div>
-                        <div class="stat-label">Efficacité</div>
-                    </div>
+                <div class="text-center mt-4">
+                    <p style="color: var(--dark-gray); font-size: 14px;">
+                        Pas de compte? <a href="#" onclick="showRegister()" style="color: var(--primary);">S'inscrire</a>
+                    </p>
                 </div>
             </div>
             
-            <!-- Control Buttons -->
-            <div class="card">
-                <div class="control-buttons">
-                    <button class="control-btn" onclick="resetTodayData()">
-                        <i class="fas fa-redo"></i>
-                        Réinitialiser jour
-                    </button>
-                    <button class="control-btn" onclick="resetAllData()">
-                        <i class="fas fa-trash-alt"></i>
-                        Réinitialiser tout
-                    </button>
-                    <button class="control-btn" onclick="syncData()">
-                        <i class="fas fa-sync"></i>
-                        Synchroniser
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Motors Screen -->
-        <div id="motorsScreen" class="screen">
-            <div class="card">
-                <div class="card-title">
-                    <i class="fas fa-cogs"></i>
-                    Suivi des moteurs
-                </div>
-                <div id="motorsContainer">
-                    <!-- Motors will be dynamically loaded here -->
-                </div>
-            </div>
-            
-            <div class="card">
-                <div class="card-title">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    Anomalies / Pannes
+            <div id="registerForm" style="display: none;">
+                <div class="form-group">
+                    <label class="form-label">Nom complet</label>
+                    <input type="text" class="form-input" id="registerName" placeholder="Votre nom">
                 </div>
                 
                 <div class="form-group">
-                    <label class="form-label">Description de l'anomalie</label>
-                    <textarea class="form-input" id="issueDescription" rows="4" placeholder="Décrivez le problème rencontré..."></textarea>
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-input" id="registerEmail" placeholder="votre@email.com">
                 </div>
                 
-                <button class="btn btn-warning" onclick="reportIssue()">
-                    <i class="fas fa-exclamation-circle"></i> Signaler une panne
+                <div class="form-group">
+                    <label class="form-label">Mot de passe</label>
+                    <input type="password" class="form-input" id="registerPassword" placeholder="Minimum 6 caractères">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Confirmer le mot de passe</label>
+                    <input type="password" class="form-input" id="registerConfirmPassword" placeholder="Retapez votre mot de passe">
+                </div>
+                
+                <button class="btn btn-primary mt-4" onclick="register()">
+                    <i class="fas fa-user-plus"></i> S'inscrire
                 </button>
+                
+                <div class="text-center mt-4">
+                    <p style="color: var(--dark-gray); font-size: 14px;">
+                        Déjà un compte? <a href="#" onclick="showLogin()" style="color: var(--primary);">Se connecter</a>
+                    </p>
+                </div>
             </div>
         </div>
+    </div>
 
-        <!-- Fuel Screen -->
-        <div id="fuelScreen" class="screen">
-            <!-- Current Fuel Level -->
-            <div class="card">
-                <div class="card-title">
-                    <i class="fas fa-oil-can"></i>
-                    Niveau de carburant actuel
+    <!-- App Content (hidden until login) -->
+    <div id="appContent" style="display: none;">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content container">
+                <div class="logo">
+                    <div class="logo-icon">S</div>
+                    <div class="logo-text">SOTUTRASM</div>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <div id="connectionStatus" class="connection-status">
+                        <i class="fas fa-wifi"></i>
+                        <span>Connecté</span>
+                    </div>
+                    <div id="userInfo" class="user-info" onclick="showUserMenu()">
+                        <i class="fas fa-user"></i>
+                        <span>Utilisateur</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <nav class="nav-tabs">
+            <div class="nav-tab active" onclick="showTab('operations')">
+                <i class="fas fa-tasks"></i>
+                <span>Opérations</span>
+            </div>
+            <div class="nav-tab" onclick="showTab('motors')">
+                <i class="fas fa-cogs"></i>
+                <span>Moteurs</span>
+            </div>
+            <div class="nav-tab" onclick="showTab('fuel')">
+                <i class="fas fa-gas-pump"></i>
+                <span>Carburant</span>
+            </div>
+            <div class="nav-tab" onclick="showTab('reports')">
+                <i class="fas fa-chart-bar"></i>
+                <span>Rapports</span>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="container">
+            <!-- Dredge Selection Screen -->
+            <div id="dredgeSelection" class="screen">
+                <div class="text-center mt-5 mb-6">
+                    <h1 style="font-size: 28px; margin-bottom: 12px; color: var(--primary);">Sélectionnez votre drague</h1>
+                    <p style="color: var(--dark-gray); font-size: 16px;">Choisissez la drague pour laquelle vous allez travailler</p>
                 </div>
                 
-                <div class="fuel-gauge">
-                    <div class="fuel-level-container">
-                        <div class="fuel-fill" id="fuelFill"></div>
-                        <div class="fuel-percentage" id="fuelPercentage">65%</div>
+                <div class="dredge-selection">
+                    <div class="dredge-card" onclick="selectDredge('blue-shark')">
+                        <div class="dredge-icon">
+                            <i class="fas fa-ship"></i>
+                        </div>
+                        <div class="dredge-name">Blue Shark</div>
+                        <div class="dredge-info">3 moteurs : CAT C32, CAT 3406, IVECO</div>
                     </div>
                     
-                    <div class="fuel-amount" id="fuelAmount">6,500 L</div>
-                    <div class="stat-label">Stock disponible sur 10,000 L</div>
+                    <div class="dredge-card" onclick="selectDredge('white-shark')">
+                        <div class="dredge-icon">
+                            <i class="fas fa-ship"></i>
+                        </div>
+                        <div class="dredge-name">White Shark</div>
+                        <div class="dredge-info">1 moteur : CAT 3512</div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Refueling -->
-            <div class="card">
-                <div class="card-title">
-                    <i class="fas fa-truck-moving"></i>
-                    Ravitaillement
+            <!-- Operations Screen -->
+            <div id="operationsScreen" class="screen">
+                <!-- Header with Dredge Info -->
+                <div class="card mb-4">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <h3 style="font-size: 20px; font-weight: 700; color: var(--primary);" id="currentDredgeTitle">
+                                Blue Shark
+                            </h3>
+                            <p style="color: var(--dark-gray); font-size: 14px;">Session en cours</p>
+                        </div>
+                        <button class="switch-dredge-btn" onclick="showSwitchDredgeModal()">
+                            <i class="fas fa-exchange-alt"></i>
+                            Changer de drague
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Timer Section -->
+                <div class="timer-section">
+                    <div class="timer-display" id="timerDisplay">00:00:00</div>
+                    <div class="timer-controls">
+                        <button class="btn btn-success" onclick="startTimer()" id="startBtn">
+                            <i class="fas fa-play"></i> Démarrer
+                        </button>
+                        <button class="btn btn-warning" onclick="pauseTimer()" id="pauseBtn" style="display: none;">
+                            <i class="fas fa-pause"></i> Pause
+                        </button>
+                        <button class="btn btn-danger" onclick="stopTimer()">
+                            <i class="fas fa-stop"></i> Arrêter
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Driver Info -->
+                <div class="card">
+                    <div class="card-title">
+                        <i class="fas fa-user"></i>
+                        Informations de l'équipe
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Nom du chauffeur</label>
+                        <input type="text" class="form-input" id="driverName" placeholder="Entrez votre nom" value="Jean Dupont">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Équipe accompagnante</label>
+                        <input type="text" class="form-input" id="teamMembers" placeholder="Noms des membres de l'équipe">
+                    </div>
+                </div>
+
+                <!-- Operation Details -->
+                <div class="card">
+                    <div class="card-title">
+                        <i class="fas fa-ruler-combined"></i>
+                        Dimensions de travail
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Longueur (mètres)</label>
+                        <input type="number" class="form-input" id="length" placeholder="0.00" step="0.1" min="0">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Largeur (mètres)</label>
+                        <input type="number" class="form-input" id="width" placeholder="0.00" step="0.1" min="0">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Profondeur (mètres)</label>
+                        <input type="number" class="form-input" id="depth" placeholder="0.00" step="0.1" min="0">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Carburant consommé (litres)</label>
+                        <input type="number" class="form-input" id="fuelConsumed" placeholder="0" min="0">
+                    </div>
+                    
+                    <button class="btn btn-primary mt-4" onclick="saveOperation()">
+                        <i class="fas fa-save"></i> Enregistrer l'opération
+                    </button>
+                </div>
+
+                <!-- Dashboard -->
+                <div class="card">
+                    <div class="card-title">
+                        <i class="fas fa-chart-line"></i>
+                        Dashboard du jour
+                    </div>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value" id="totalHours">00:00</div>
+                            <div class="stat-label">Heures travaillées</div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-value" id="totalVolume">0 m³</div>
+                            <div class="stat-label">Volume dredgé</div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-value" id="totalFuel">0 L</div>
+                            <div class="stat-label">Carburant consommé</div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-value" id="efficiency">0 L/m³</div>
+                            <div class="stat-label">Efficacité</div>
+                        </div>
+                    </div>
                 </div>
                 
-                <div class="form-group">
-                    <label class="form-label">Quantité ajoutée (litres)</label>
-                    <input type="number" class="form-input" id="refuelAmount" placeholder="0" min="0">
+                <!-- Control Buttons -->
+                <div class="card">
+                    <div class="control-buttons">
+                        <button class="control-btn" onclick="resetTodayData()">
+                            <i class="fas fa-redo"></i>
+                            Réinitialiser jour
+                        </button>
+                        <button class="control-btn" onclick="resetAllData()">
+                            <i class="fas fa-trash-alt"></i>
+                            Réinitialiser tout
+                        </button>
+                        <button class="control-btn" onclick="syncData()">
+                            <i class="fas fa-sync"></i>
+                            Synchroniser
+                        </button>
+                        <button class="control-btn" onclick="loadCloudData()">
+                            <i class="fas fa-cloud-download-alt"></i>
+                            Charger du cloud
+                        </button>
+                    </div>
                 </div>
-                
-                <button class="btn btn-primary" onclick="addFuel()">
-                    <i class="fas fa-plus-circle"></i> Ajouter au stock
-                </button>
             </div>
 
-            <!-- Fuel History -->
-            <div class="card">
-                <div class="card-title">
-                    <i class="fas fa-history"></i>
-                    Historique carburant
+            <!-- Motors Screen -->
+            <div id="motorsScreen" class="screen">
+                <div class="card">
+                    <div class="card-title">
+                        <i class="fas fa-cogs"></i>
+                        Suivi des moteurs
+                    </div>
+                    <div id="motorsContainer">
+                        <!-- Motors will be dynamically loaded here -->
+                    </div>
                 </div>
                 
-                <div id="fuelHistory">
-                    <!-- Fuel history will be loaded here -->
+                <div class="card">
+                    <div class="card-title">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Anomalies / Pannes
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Description de l'anomalie</label>
+                        <textarea class="form-input" id="issueDescription" rows="4" placeholder="Décrivez le problème rencontré..."></textarea>
+                    </div>
+                    
+                    <button class="btn btn-warning" onclick="reportIssue()">
+                        <i class="fas fa-exclamation-circle"></i> Signaler une panne
+                    </button>
                 </div>
-            </div>
-        </div>
-
-        <!-- Reports Screen -->
-        <div id="reportsScreen" class="screen">
-            <!-- Report Generation -->
-            <div class="card">
-                <div class="card-title">
-                    <i class="fas fa-file-alt"></i>
-                    Générer un rapport
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Type de rapport</label>
-                    <select class="form-input" id="reportType">
-                        <option value="weekly">Hebdomadaire</option>
-                        <option value="monthly">Mensuel</option>
-                    </select>
-                </div>
-                
-                <button class="btn btn-primary mb-4" onclick="generateReport()">
-                    <i class="fas fa-chart-pie"></i> Générer le rapport
-                </button>
-                
-                <button class="btn btn-success" onclick="exportPDF()">
-                    <i class="fas fa-file-pdf"></i> Exporter en PDF
-                </button>
             </div>
 
-            <!-- Report List -->
-            <div class="card">
-                <div class="card-title">
-                    <i class="fas fa-folder-open"></i>
-                    Rapports récents
+            <!-- Fuel Screen -->
+            <div id="fuelScreen" class="screen">
+                <!-- Current Fuel Level -->
+                <div class="card">
+                    <div class="card-title">
+                        <i class="fas fa-oil-can"></i>
+                        Niveau de carburant actuel
+                    </div>
+                    
+                    <div class="fuel-gauge">
+                        <div class="fuel-level-container">
+                            <div class="fuel-fill" id="fuelFill"></div>
+                            <div class="fuel-percentage" id="fuelPercentage">65%</div>
+                        </div>
+                        
+                        <div class="fuel-amount" id="fuelAmount">6,500 L</div>
+                        <div class="stat-label">Stock disponible sur 10,000 L</div>
+                    </div>
                 </div>
-                
-                <div id="reportsList">
-                    <!-- Reports will be loaded here -->
+
+                <!-- Refueling -->
+                <div class="card">
+                    <div class="card-title">
+                        <i class="fas fa-truck-moving"></i>
+                        Ravitaillement
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Quantité ajoutée (litres)</label>
+                        <input type="number" class="form-input" id="refuelAmount" placeholder="0" min="0">
+                    </div>
+                    
+                    <button class="btn btn-primary" onclick="addFuel()">
+                        <i class="fas fa-plus-circle"></i> Ajouter au stock
+                    </button>
+                </div>
+
+                <!-- Fuel History -->
+                <div class="card">
+                    <div class="card-title">
+                        <i class="fas fa-history"></i>
+                        Historique carburant
+                    </div>
+                    
+                    <div id="fuelHistory">
+                        <!-- Fuel history will be loaded here -->
+                    </div>
                 </div>
             </div>
-        </div>
-    </main>
+
+            <!-- Reports Screen -->
+            <div id="reportsScreen" class="screen">
+                <!-- Report Generation -->
+                <div class="card">
+                    <div class="card-title">
+                        <i class="fas fa-file-alt"></i>
+                        Générer un rapport
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Type de rapport</label>
+                        <select class="form-input" id="reportType">
+                            <option value="weekly">Hebdomadaire</option>
+                            <option value="monthly">Mensuel</option>
+                        </select>
+                    </div>
+                    
+                    <button class="btn btn-primary mb-4" onclick="generateReport()">
+                        <i class="fas fa-chart-pie"></i> Générer le rapport
+                    </button>
+                    
+                    <button class="btn btn-success" onclick="exportPDF()">
+                        <i class="fas fa-file-pdf"></i> Exporter en PDF
+                    </button>
+                </div>
+
+                <!-- Report List -->
+                <div class="card">
+                    <div class="card-title">
+                        <i class="fas fa-folder-open"></i>
+                        Rapports récents
+                    </div>
+                    
+                    <div id="reportsList">
+                        <!-- Reports will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
 
     <!-- Modals -->
     <div id="switchDredgeModal" class="modal-overlay">
@@ -1195,6 +1316,25 @@
         </div>
     </div>
 
+    <div id="userMenuModal" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-title">Mon compte</div>
+            <div class="modal-text">
+                <div id="userEmailDisplay" style="margin-bottom: 15px;"></div>
+                <div id="userStats" style="font-size: 14px;">
+                    <div>Dernière synchronisation: <span id="lastSyncDisplay">Jamais</span></div>
+                    <div>Données sauvegardées: <span id="dataSizeDisplay">0</span></div>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="control-btn" onclick="closeModal('userMenuModal')">Fermer</button>
+                <button class="control-btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Déconnexion
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Notification -->
     <div id="notification" class="notification">
         <i class="fas fa-check-circle"></i>
@@ -1202,7 +1342,28 @@
     </div>
 
     <script>
+        // ==============================
+        // Firebase Configuration
+        // ==============================
+        const firebaseConfig = {
+            apiKey: "AIzaSyBJxyFwFseINtXqdEU0JYESl6zQYVj0hSw",
+            authDomain: "sotutrasm-manager.firebaseapp.com",
+            projectId: "sotutrasm-manager",
+            storageBucket: "sotutrasm-manager.firebasestorage.app",
+            messagingSenderId: "452756329466",
+            appId: "1:452756329466:web:8c5b54a2818e4602874a43",
+            measurementId: "G-GGQC6EDSZB",
+            databaseURL: "https://sotutrasm-manager-default-rtdb.europe-west1.firebasedatabase.app/"
+        };
+
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const database = firebase.database();
+
+        // ==============================
         // Application State
+        // ==============================
         let state = {
             currentDredge: null,
             selectedDredge: null,
@@ -1234,61 +1395,347 @@
                 history: []
             },
             reports: [],
-            lastSync: null
+            lastSync: null,
+            userData: {
+                uid: null,
+                email: null,
+                displayName: null
+            }
         };
 
+        // ==============================
         // PWA Variables
+        // ==============================
         let deferredPrompt;
         let isAppInstalled = false;
 
+        // ==============================
         // Initialize the application
+        // ==============================
         document.addEventListener('DOMContentLoaded', function() {
-            // Load from localStorage
-            loadFromLocalStorage();
-            
-            // Initialize data
-            updateFuelDisplay();
-            loadReports();
-            updateDashboard();
-            
-            // Start connection monitoring
-            monitorConnection();
-            
-            // Auto-save every 30 seconds
-            setInterval(saveToLocalStorage, 30000);
-            
-            // Initialize PWA
-            initPWA();
-            
-            // Check if dredge is already selected
-            if (state.selectedDredge) {
-                showMainApp();
-            }
+            // Initialize Firebase Auth state listener
+            auth.onAuthStateChanged((user) => {
+                if (user) {
+                    // User is signed in
+                    state.userData.uid = user.uid;
+                    state.userData.email = user.email;
+                    state.userData.displayName = user.displayName || user.email.split('@')[0];
+                    
+                    updateUserDisplay();
+                    showAppContent();
+                    
+                    // Load from localStorage first
+                    loadFromLocalStorage();
+                    
+                    // Then try to load from cloud
+                    loadCloudData();
+                    
+                    // Initialize data
+                    updateFuelDisplay();
+                    loadReports();
+                    updateDashboard();
+                    
+                    // Start connection monitoring
+                    monitorConnection();
+                    
+                    // Auto-save every 30 seconds
+                    setInterval(saveToLocalStorage, 30000);
+                    
+                    // Auto-sync every 5 minutes if online
+                    setInterval(() => {
+                        if (navigator.onLine && state.userData.uid) {
+                            syncData();
+                        }
+                    }, 300000);
+                    
+                    // Initialize PWA
+                    initPWA();
+                } else {
+                    // User is signed out
+                    showLoginScreen();
+                }
+            });
         });
 
-        // Initialize PWA
+        // ==============================
+        // Firebase Authentication
+        // ==============================
+        function login() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            if (!email || !password) {
+                showNotification('Veuillez remplir tous les champs', 'warning');
+                return;
+            }
+            
+            showNotification('Connexion en cours...', 'info');
+            
+            auth.signInWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    showNotification('Connexion réussie!');
+                })
+                .catch((error) => {
+                    console.error('Login error:', error);
+                    showNotification('Erreur de connexion: ' + error.message, 'error');
+                });
+        }
+        
+        function loginAnonymously() {
+            showNotification('Connexion anonyme en cours...', 'info');
+            
+            auth.signInAnonymously()
+                .then((userCredential) => {
+                    showNotification('Connecté en mode anonyme');
+                })
+                .catch((error) => {
+                    console.error('Anonymous login error:', error);
+                    showNotification('Erreur de connexion anonyme', 'error');
+                });
+        }
+        
+        function showRegister() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'block';
+        }
+        
+        function showLogin() {
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'block';
+        }
+        
+        function register() {
+            const name = document.getElementById('registerName').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const confirmPassword = document.getElementById('registerConfirmPassword').value;
+            
+            if (!name || !email || !password || !confirmPassword) {
+                showNotification('Veuillez remplir tous les champs', 'warning');
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                showNotification('Les mots de passe ne correspondent pas', 'warning');
+                return;
+            }
+            
+            if (password.length < 6) {
+                showNotification('Le mot de passe doit avoir au moins 6 caractères', 'warning');
+                return;
+            }
+            
+            showNotification('Création du compte en cours...', 'info');
+            
+            auth.createUserWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    // Update user profile
+                    return userCredential.user.updateProfile({
+                        displayName: name
+                    });
+                })
+                .then(() => {
+                    showNotification('Compte créé avec succès!');
+                    showLogin();
+                })
+                .catch((error) => {
+                    console.error('Registration error:', error);
+                    showNotification('Erreur d\'inscription: ' + error.message, 'error');
+                });
+        }
+        
+        function logout() {
+            if (confirm('Voulez-vous vraiment vous déconnecter?')) {
+                auth.signOut().then(() => {
+                    showNotification('Déconnexion réussie');
+                }).catch((error) => {
+                    console.error('Logout error:', error);
+                });
+            }
+        }
+        
+        function updateUserDisplay() {
+            const userInfo = document.getElementById('userInfo');
+            if (userInfo && state.userData.displayName) {
+                userInfo.innerHTML = `<i class="fas fa-user"></i><span>${state.userData.displayName}</span>`;
+            }
+            
+            const userEmailDisplay = document.getElementById('userEmailDisplay');
+            if (userEmailDisplay) {
+                const isAnonymous = auth.currentUser && auth.currentUser.isAnonymous;
+                userEmailDisplay.innerHTML = `
+                    <strong>Email:</strong> ${isAnonymous ? 'Mode anonyme' : state.userData.email}<br>
+                    <strong>UID:</strong> ${state.userData.uid.substring(0, 8)}...
+                `;
+            }
+        }
+        
+        function showUserMenu() {
+            const lastSyncDisplay = document.getElementById('lastSyncDisplay');
+            if (lastSyncDisplay) {
+                lastSyncDisplay.textContent = state.lastSync ? 
+                    new Date(state.lastSync).toLocaleString('fr-FR') : 'Jamais';
+            }
+            
+            const dataSizeDisplay = document.getElementById('dataSizeDisplay');
+            if (dataSizeDisplay) {
+                const dataSize = JSON.stringify(state).length;
+                dataSizeDisplay.textContent = Math.round(dataSize / 1024) + ' KB';
+            }
+            
+            document.getElementById('userMenuModal').style.display = 'flex';
+        }
+
+        // ==============================
+        // Cloud Sync Functions
+        // ==============================
+        function syncData() {
+            if (!state.userData.uid) {
+                showNotification('Veuillez vous connecter pour synchroniser', 'warning');
+                return;
+            }
+            
+            showNotification('Synchronisation avec le cloud...', 'info');
+            
+            // Prepare data for cloud (exclude sensitive info)
+            const cloudData = {
+                ...state,
+                userData: {
+                    uid: state.userData.uid,
+                    email: state.userData.email,
+                    displayName: state.userData.displayName
+                },
+                syncedAt: new Date().toISOString()
+            };
+            
+            // Remove timer interval for cloud storage
+            delete cloudData.timer.interval;
+            
+            // Save to Firebase Realtime Database
+            database.ref('users/' + state.userData.uid).set(cloudData)
+                .then(() => {
+                    state.lastSync = new Date().toISOString();
+                    saveToLocalStorage();
+                    showNotification('Données synchronisées avec succès!');
+                    
+                    // Update local timestamp
+                    localStorage.setItem('lastCloudSync', state.lastSync);
+                })
+                .catch((error) => {
+                    console.error('Cloud sync error:', error);
+                    showNotification('Erreur de synchronisation: ' + error.message, 'error');
+                    
+                    // Save to pending sync
+                    savePendingSync(cloudData);
+                });
+        }
+        
+        function loadCloudData() {
+            if (!state.userData.uid) {
+                showNotification('Veuillez vous connecter pour charger les données', 'warning');
+                return;
+            }
+            
+            if (!confirm('Charger les données depuis le cloud? Cela remplacera les données locales.')) {
+                return;
+            }
+            
+            showNotification('Chargement depuis le cloud...', 'info');
+            
+            database.ref('users/' + state.userData.uid).once('value')
+                .then((snapshot) => {
+                    const cloudData = snapshot.val();
+                    if (cloudData) {
+                        // Merge cloud data with local state
+                        // Keep local timer state
+                        const localTimer = state.timer;
+                        
+                        // Update state with cloud data
+                        state = {
+                            ...cloudData,
+                            timer: {
+                                ...cloudData.timer,
+                                interval: null,
+                                running: localTimer.running, // Keep local running state
+                                startTime: localTimer.running ? localTimer.startTime : null
+                            }
+                        };
+                        
+                        // Restore user data
+                        state.userData = {
+                            uid: state.userData.uid,
+                            email: state.userData.email,
+                            displayName: state.userData.displayName
+                        };
+                        
+                        // Update UI
+                        updateFuelDisplay();
+                        loadReports();
+                        updateDashboard();
+                        
+                        if (state.selectedDredge) {
+                            state.currentDredge = state.selectedDredge === 'blue-shark' ? 'Blue Shark' : 'White Shark';
+                            document.getElementById('currentDredgeTitle').textContent = state.currentDredge;
+                            calculateDailyData();
+                            loadMotors();
+                        }
+                        
+                        // Save merged data to localStorage
+                        saveToLocalStorage();
+                        
+                        showNotification('Données chargées depuis le cloud!');
+                    } else {
+                        showNotification('Aucune donnée trouvée dans le cloud', 'info');
+                    }
+                })
+                .catch((error) => {
+                    console.error('Cloud load error:', error);
+                    showNotification('Erreur de chargement: ' + error.message, 'error');
+                });
+        }
+        
+        function savePendingSync(data) {
+            const pendingSync = JSON.parse(localStorage.getItem('pendingSync') || '[]');
+            pendingSync.push({
+                data: data,
+                timestamp: new Date().toISOString()
+            });
+            localStorage.setItem('pendingSync', JSON.stringify(pendingSync));
+            showNotification('Données sauvegardées pour synchronisation ultérieure', 'info');
+        }
+        
+        function retryPendingSync() {
+            const pendingSync = JSON.parse(localStorage.getItem('pendingSync') || '[]');
+            if (pendingSync.length > 0 && navigator.onLine && state.userData.uid) {
+                showNotification('Tentative de synchronisation des données en attente...', 'info');
+                
+                pendingSync.forEach((item, index) => {
+                    database.ref('users/' + state.userData.uid).set(item.data)
+                        .then(() => {
+                            // Remove successfully synced item
+                            pendingSync.splice(index, 1);
+                            localStorage.setItem('pendingSync', JSON.stringify(pendingSync));
+                        })
+                        .catch((error) => {
+                            console.error('Pending sync error:', error);
+                        });
+                });
+            }
+        }
+
+        // ==============================
+        // PWA Functions
+        // ==============================
         function initPWA() {
             // Register Service Worker
             if ('serviceWorker' in navigator) {
                 window.addEventListener('load', () => {
                     navigator.serviceWorker.register('service-worker.js')
-                        .then(registration => {
-                            console.log('Service Worker enregistré avec succès:', registration);
-                            
-                            // Check for updates
-                            registration.addEventListener('updatefound', () => {
-                                const newWorker = registration.installing;
-                                console.log('Nouveau Service Worker trouvé:', newWorker);
-                                
-                                newWorker.addEventListener('statechange', () => {
-                                    if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                        showNotification('Nouvelle version disponible. Rechargez la page.', 'info');
-                                    }
-                                });
-                            });
+                        .then((registration) => {
+                            console.log('Service Worker enregistré:', registration);
                         })
-                        .catch(error => {
-                            console.log('Erreur lors de l\'enregistrement du Service Worker:', error);
+                        .catch((error) => {
+                            console.log('Erreur Service Worker:', error);
                         });
                 });
             }
@@ -1308,14 +1755,13 @@
             
             // Listen for app installed event
             window.addEventListener('appinstalled', () => {
-                console.log('Application installée avec succès');
+                console.log('Application installée');
                 isAppInstalled = true;
                 document.getElementById('installButton').style.display = 'none';
                 showNotification('Application installée avec succès!');
             });
         }
-
-        // Show install button
+        
         function showInstallButton() {
             const installBtn = document.getElementById('installButton');
             if (!isAppInstalled && deferredPrompt) {
@@ -1323,8 +1769,7 @@
                 installBtn.onclick = installApp;
             }
         }
-
-        // Install app
+        
         function installApp() {
             if (deferredPrompt) {
                 deferredPrompt.prompt();
@@ -1332,21 +1777,20 @@
                 deferredPrompt.userChoice.then((choiceResult) => {
                     if (choiceResult.outcome === 'accepted') {
                         console.log('Utilisateur a accepté l\'installation');
-                        showNotification('Installation en cours...', 'info');
                     }
                     deferredPrompt = null;
                 });
             }
         }
-
-        // Check if app is running in standalone mode
+        
         function isRunningStandalone() {
             return window.matchMedia('(display-mode: standalone)').matches || 
-                   window.navigator.standalone === true ||
-                   document.referrer.includes('android-app://');
+                   window.navigator.standalone === true;
         }
 
-        // Monitor internet connection
+        // ==============================
+        // Connection Monitoring
+        // ==============================
         function monitorConnection() {
             const connectionStatus = document.getElementById('connectionStatus');
             const offlineIndicator = document.getElementById('offlineIndicator');
@@ -1357,13 +1801,8 @@
                     connectionStatus.classList.remove('offline');
                     offlineIndicator.classList.remove('show');
                     
-                    // Try to sync if we haven't synced in a while
-                    if (state.lastSync) {
-                        const timeSinceSync = Date.now() - new Date(state.lastSync).getTime();
-                        if (timeSinceSync > 300000) { // 5 minutes
-                            syncData();
-                        }
-                    }
+                    // Retry pending sync when online
+                    retryPendingSync();
                 } else {
                     connectionStatus.innerHTML = '<i class="fas fa-wifi-slash"></i><span>Hors ligne</span>';
                     connectionStatus.classList.add('offline');
@@ -1376,43 +1815,25 @@
             window.addEventListener('offline', updateConnectionStatus);
         }
 
-        // Sync data with cloud
-        function syncData() {
-            showNotification('Synchronisation en cours...', 'info');
-            
-            // Simulate cloud sync
-            setTimeout(() => {
-                state.lastSync = new Date().toISOString();
-                saveToLocalStorage();
-                
-                // Try to sync pending data if any
-                syncPendingData();
-                
-                showNotification('Données synchronisées avec succès');
-            }, 1000);
+        // ==============================
+        // Screen Management
+        // ==============================
+        function showLoginScreen() {
+            document.getElementById('loginScreen').classList.add('active');
+            document.getElementById('appContent').style.display = 'none';
+        }
+        
+        function showAppContent() {
+            document.getElementById('loginScreen').classList.remove('active');
+            document.getElementById('appContent').style.display = 'block';
+            document.getElementById('operationsScreen').classList.add('active');
         }
 
-        // Sync pending data
-        function syncPendingData() {
-            const pendingData = JSON.parse(localStorage.getItem('pendingData') || '[]');
-            if (pendingData.length > 0) {
-                // Simulate sending to server
-                console.log('Syncing pending data:', pendingData.length, 'items');
-                
-                // Clear pending data after successful sync
-                localStorage.removeItem('pendingData');
-                showNotification(`${pendingData.length} données en attente synchronisées`);
-            }
-        }
-
-        // Save pending data for offline use
-        function savePendingData(data) {
-            const pending = JSON.parse(localStorage.getItem('pendingData') || '[]');
-            pending.push(data);
-            localStorage.setItem('pendingData', JSON.stringify(pending));
-            console.log('Data saved for offline sync:', data);
-        }
-
+        // ==============================
+        // Existing Application Functions
+        // (Keep all your existing functions as they were)
+        // ==============================
+        
         // Dredge Selection
         function selectDredge(dredgeType) {
             state.selectedDredge = dredgeType;
@@ -1429,18 +1850,18 @@
             // Load motors for selected dredge
             loadMotors();
             
-            // Show main app
-            setTimeout(showMainApp, 500);
-            showNotification(`Drague ${state.currentDredge} sélectionnée`);
-        }
-
-        function showMainApp() {
+            // Switch to operations screen
             document.getElementById('dredgeSelection').classList.remove('active');
             document.getElementById('operationsScreen').classList.add('active');
+            
+            // Update active tab
+            document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelector('.nav-tab:nth-child(1)').classList.add('active');
+            
+            showNotification(`Drague ${state.currentDredge} sélectionnée`);
             saveToLocalStorage();
         }
 
-        // Switch Dredge Functions
         function showSwitchDredgeModal() {
             document.getElementById('switchDredgeModal').style.display = 'flex';
         }
@@ -1458,7 +1879,7 @@
             saveToLocalStorage();
         }
 
-        // Timer Functions - CONTINUES EVEN AFTER REFRESH
+        // Timer Functions
         function startTimer() {
             if (!state.timer.running) {
                 state.timer.running = true;
@@ -1584,15 +2005,6 @@
                 team: document.getElementById('teamMembers').value
             };
             
-            // If offline, save to pending data
-            if (!navigator.onLine) {
-                savePendingData({
-                    type: 'operation',
-                    data: operationData
-                });
-                showNotification('Opération sauvegardée localement (hors ligne)', 'info');
-            }
-            
             // Add to operations
             state.operations.push(operationData);
             
@@ -1605,9 +2017,12 @@
             updateDashboard();
             saveToLocalStorage();
             
-            if (navigator.onLine) {
-                showNotification('Opération enregistrée avec succès');
+            // Auto-sync if online
+            if (navigator.onLine && state.userData.uid) {
+                syncData();
             }
+            
+            showNotification('Opération enregistrée avec succès');
         }
 
         // Reset Data Functions
@@ -1641,7 +2056,7 @@
             state.operations = [];
             state.dailyData = { hours: 0, volume: 0, fuel: 0 };
             state.fuel = {
-                current: 0, // Start from 0
+                current: 0,
                 capacity: 10000,
                 history: []
             };
