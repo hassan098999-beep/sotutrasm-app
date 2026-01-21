@@ -27,9 +27,8 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Firebase SDK -->
+    <!-- Firebase SDK (Database only) -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
     
     <style>
@@ -142,8 +141,8 @@
             font-size: 10px;
         }
         
-        /* User Info */
-        .user-info {
+        /* Device ID Display */
+        .device-info {
             display: flex;
             align-items: center;
             gap: 8px;
@@ -153,6 +152,7 @@
             background-color: rgba(37, 99, 235, 0.1);
             color: var(--primary);
             font-weight: 500;
+            cursor: pointer;
         }
         
         /* Navigation Tabs */
@@ -709,24 +709,6 @@
             display: block;
         }
         
-        /* Login Card */
-        .login-card {
-            max-width: 400px;
-            margin: 50px auto;
-        }
-        
-        .login-logo {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        
-        .login-logo .logo-icon {
-            margin: 0 auto 15px;
-            width: 60px;
-            height: 60px;
-            font-size: 24px;
-        }
-        
         /* Utility Classes */
         .text-center { text-align: center; }
         .mt-1 { margin-top: 4px; }
@@ -889,80 +871,8 @@
         <i class="fas fa-download"></i> Installer
     </button>
 
-    <!-- Login Screen -->
-    <div id="loginScreen" class="screen active">
-        <div class="login-card card">
-            <div class="login-logo">
-                <div class="logo-icon">S</div>
-                <div class="logo-text">SOTUTRASM</div>
-                <p style="color: var(--dark-gray); margin-top: 10px;">Connexion requise</p>
-            </div>
-            
-            <div id="loginForm">
-                <div class="form-group">
-                    <label class="form-label">Email</label>
-                    <input type="email" class="form-input" id="loginEmail" placeholder="votre@email.com">
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Mot de passe</label>
-                    <input type="password" class="form-input" id="loginPassword" placeholder="Votre mot de passe">
-                </div>
-                
-                <button class="btn btn-primary mt-4" onclick="login()">
-                    <i class="fas fa-sign-in-alt"></i> Se connecter
-                </button>
-                
-                <div class="text-center mt-4">
-                    <p style="color: var(--dark-gray); font-size: 14px;">OU</p>
-                    <button class="btn btn-outline mt-2" onclick="loginAnonymously()">
-                        <i class="fas fa-user-secret"></i> Continuer anonymement
-                    </button>
-                </div>
-                
-                <div class="text-center mt-4">
-                    <p style="color: var(--dark-gray); font-size: 14px;">
-                        Pas de compte? <a href="#" onclick="showRegister()" style="color: var(--primary);">S'inscrire</a>
-                    </p>
-                </div>
-            </div>
-            
-            <div id="registerForm" style="display: none;">
-                <div class="form-group">
-                    <label class="form-label">Nom complet</label>
-                    <input type="text" class="form-input" id="registerName" placeholder="Votre nom">
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Email</label>
-                    <input type="email" class="form-input" id="registerEmail" placeholder="votre@email.com">
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Mot de passe</label>
-                    <input type="password" class="form-input" id="registerPassword" placeholder="Minimum 6 caractères">
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Confirmer le mot de passe</label>
-                    <input type="password" class="form-input" id="registerConfirmPassword" placeholder="Retapez votre mot de passe">
-                </div>
-                
-                <button class="btn btn-primary mt-4" onclick="register()">
-                    <i class="fas fa-user-plus"></i> S'inscrire
-                </button>
-                
-                <div class="text-center mt-4">
-                    <p style="color: var(--dark-gray); font-size: 14px;">
-                        Déjà un compte? <a href="#" onclick="showLogin()" style="color: var(--primary);">Se connecter</a>
-                    </p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- App Content (hidden until login) -->
-    <div id="appContent" style="display: none;">
+    <!-- App Content -->
+    <div id="appContent">
         <!-- Header -->
         <header class="header">
             <div class="header-content container">
@@ -975,9 +885,9 @@
                         <i class="fas fa-wifi"></i>
                         <span>Connecté</span>
                     </div>
-                    <div id="userInfo" class="user-info" onclick="showUserMenu()">
-                        <i class="fas fa-user"></i>
-                        <span>Utilisateur</span>
+                    <div id="deviceInfo" class="device-info" onclick="showDeviceModal()">
+                        <i class="fas fa-mobile-alt"></i>
+                        <span id="deviceIdDisplay">Appareil</span>
                     </div>
                 </div>
             </div>
@@ -1006,7 +916,7 @@
         <!-- Main Content -->
         <main class="container">
             <!-- Dredge Selection Screen -->
-            <div id="dredgeSelection" class="screen">
+            <div id="dredgeSelection" class="screen active">
                 <div class="text-center mt-5 mb-6">
                     <h1 style="font-size: 28px; margin-bottom: 12px; color: var(--primary);">Sélectionnez votre drague</h1>
                     <p style="color: var(--dark-gray); font-size: 16px;">Choisissez la drague pour laquelle vous allez travailler</p>
@@ -1316,20 +1226,23 @@
         </div>
     </div>
 
-    <div id="userMenuModal" class="modal-overlay">
+    <div id="deviceModal" class="modal-overlay">
         <div class="modal">
-            <div class="modal-title">Mon compte</div>
+            <div class="modal-title">Informations de l'appareil</div>
             <div class="modal-text">
-                <div id="userEmailDisplay" style="margin-bottom: 15px;"></div>
-                <div id="userStats" style="font-size: 14px;">
+                <div style="margin-bottom: 15px;">
+                    <strong>ID Appareil:</strong> <span id="deviceIdFullDisplay"></span>
+                </div>
+                <div id="deviceStats" style="font-size: 14px;">
                     <div>Dernière synchronisation: <span id="lastSyncDisplay">Jamais</span></div>
                     <div>Données sauvegardées: <span id="dataSizeDisplay">0</span></div>
+                    <div>Appareil unique: <span id="isUniqueDevice">Oui</span></div>
                 </div>
             </div>
             <div class="modal-actions">
-                <button class="control-btn" onclick="closeModal('userMenuModal')">Fermer</button>
-                <button class="control-btn" onclick="logout()">
-                    <i class="fas fa-sign-out-alt"></i> Déconnexion
+                <button class="control-btn" onclick="closeModal('deviceModal')">Fermer</button>
+                <button class="control-btn" onclick="copyDeviceId()">
+                    <i class="fas fa-copy"></i> Copier ID
                 </button>
             </div>
         </div>
@@ -1356,9 +1269,8 @@
             databaseURL: "https://sotutrasm-manager-default-rtdb.europe-west1.firebasedatabase.app/"
         };
 
-        // Initialize Firebase
+        // Initialize Firebase (Database only)
         const app = firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
         const database = firebase.database();
 
         // ==============================
@@ -1396,11 +1308,7 @@
             },
             reports: [],
             lastSync: null,
-            userData: {
-                uid: null,
-                email: null,
-                displayName: null
-            }
+            deviceId: null
         };
 
         // ==============================
@@ -1413,164 +1321,68 @@
         // Initialize the application
         // ==============================
         document.addEventListener('DOMContentLoaded', function() {
-            // Initialize Firebase Auth state listener
-            auth.onAuthStateChanged((user) => {
-                if (user) {
-                    // User is signed in
-                    state.userData.uid = user.uid;
-                    state.userData.email = user.email;
-                    state.userData.displayName = user.displayName || user.email.split('@')[0];
-                    
-                    updateUserDisplay();
-                    showAppContent();
-                    
-                    // Load from localStorage first
-                    loadFromLocalStorage();
-                    
-                    // Then try to load from cloud
-                    loadCloudData();
-                    
-                    // Initialize data
-                    updateFuelDisplay();
-                    loadReports();
-                    updateDashboard();
-                    
-                    // Start connection monitoring
-                    monitorConnection();
-                    
-                    // Auto-save every 30 seconds
-                    setInterval(saveToLocalStorage, 30000);
-                    
-                    // Auto-sync every 5 minutes if online
-                    setInterval(() => {
-                        if (navigator.onLine && state.userData.uid) {
-                            syncData();
-                        }
-                    }, 300000);
-                    
-                    // Initialize PWA
-                    initPWA();
-                } else {
-                    // User is signed out
-                    showLoginScreen();
+            // Generate or retrieve device ID
+            generateDeviceId();
+            
+            // Load from localStorage
+            loadFromLocalStorage();
+            
+            // Initialize data
+            updateFuelDisplay();
+            loadReports();
+            updateDashboard();
+            
+            // Start connection monitoring
+            monitorConnection();
+            
+            // Auto-save every 30 seconds
+            setInterval(saveToLocalStorage, 30000);
+            
+            // Auto-sync every 5 minutes if online
+            setInterval(() => {
+                if (navigator.onLine && state.deviceId) {
+                    syncData();
                 }
-            });
+            }, 300000);
+            
+            // Initialize PWA
+            initPWA();
+            
+            // Check if dredge is already selected
+            if (state.selectedDredge) {
+                showMainApp();
+            }
         });
 
         // ==============================
-        // Firebase Authentication
+        // Device ID Management
         // ==============================
-        function login() {
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
+        function generateDeviceId() {
+            // Try to get existing device ID from localStorage
+            let deviceId = localStorage.getItem('sotutrasm_device_id');
             
-            if (!email || !password) {
-                showNotification('Veuillez remplir tous les champs', 'warning');
-                return;
+            if (!deviceId) {
+                // Generate new device ID
+                deviceId = 'device-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+                localStorage.setItem('sotutrasm_device_id', deviceId);
             }
             
-            showNotification('Connexion en cours...', 'info');
+            state.deviceId = deviceId;
             
-            auth.signInWithEmailAndPassword(email, password)
-                .then((userCredential) => {
-                    showNotification('Connexion réussie!');
-                })
-                .catch((error) => {
-                    console.error('Login error:', error);
-                    showNotification('Erreur de connexion: ' + error.message, 'error');
-                });
-        }
-        
-        function loginAnonymously() {
-            showNotification('Connexion anonyme en cours...', 'info');
+            // Update display
+            const deviceIdDisplay = document.getElementById('deviceIdDisplay');
+            const deviceIdFullDisplay = document.getElementById('deviceIdFullDisplay');
             
-            auth.signInAnonymously()
-                .then((userCredential) => {
-                    showNotification('Connecté en mode anonyme');
-                })
-                .catch((error) => {
-                    console.error('Anonymous login error:', error);
-                    showNotification('Erreur de connexion anonyme', 'error');
-                });
-        }
-        
-        function showRegister() {
-            document.getElementById('loginForm').style.display = 'none';
-            document.getElementById('registerForm').style.display = 'block';
-        }
-        
-        function showLogin() {
-            document.getElementById('registerForm').style.display = 'none';
-            document.getElementById('loginForm').style.display = 'block';
-        }
-        
-        function register() {
-            const name = document.getElementById('registerName').value;
-            const email = document.getElementById('registerEmail').value;
-            const password = document.getElementById('registerPassword').value;
-            const confirmPassword = document.getElementById('registerConfirmPassword').value;
-            
-            if (!name || !email || !password || !confirmPassword) {
-                showNotification('Veuillez remplir tous les champs', 'warning');
-                return;
+            if (deviceIdDisplay) {
+                deviceIdDisplay.textContent = deviceId.substring(0, 8) + '...';
             }
             
-            if (password !== confirmPassword) {
-                showNotification('Les mots de passe ne correspondent pas', 'warning');
-                return;
-            }
-            
-            if (password.length < 6) {
-                showNotification('Le mot de passe doit avoir au moins 6 caractères', 'warning');
-                return;
-            }
-            
-            showNotification('Création du compte en cours...', 'info');
-            
-            auth.createUserWithEmailAndPassword(email, password)
-                .then((userCredential) => {
-                    // Update user profile
-                    return userCredential.user.updateProfile({
-                        displayName: name
-                    });
-                })
-                .then(() => {
-                    showNotification('Compte créé avec succès!');
-                    showLogin();
-                })
-                .catch((error) => {
-                    console.error('Registration error:', error);
-                    showNotification('Erreur d\'inscription: ' + error.message, 'error');
-                });
-        }
-        
-        function logout() {
-            if (confirm('Voulez-vous vraiment vous déconnecter?')) {
-                auth.signOut().then(() => {
-                    showNotification('Déconnexion réussie');
-                }).catch((error) => {
-                    console.error('Logout error:', error);
-                });
+            if (deviceIdFullDisplay) {
+                deviceIdFullDisplay.textContent = deviceId;
             }
         }
         
-        function updateUserDisplay() {
-            const userInfo = document.getElementById('userInfo');
-            if (userInfo && state.userData.displayName) {
-                userInfo.innerHTML = `<i class="fas fa-user"></i><span>${state.userData.displayName}</span>`;
-            }
-            
-            const userEmailDisplay = document.getElementById('userEmailDisplay');
-            if (userEmailDisplay) {
-                const isAnonymous = auth.currentUser && auth.currentUser.isAnonymous;
-                userEmailDisplay.innerHTML = `
-                    <strong>Email:</strong> ${isAnonymous ? 'Mode anonyme' : state.userData.email}<br>
-                    <strong>UID:</strong> ${state.userData.uid.substring(0, 8)}...
-                `;
-            }
-        }
-        
-        function showUserMenu() {
+        function showDeviceModal() {
             const lastSyncDisplay = document.getElementById('lastSyncDisplay');
             if (lastSyncDisplay) {
                 lastSyncDisplay.textContent = state.lastSync ? 
@@ -1583,36 +1395,43 @@
                 dataSizeDisplay.textContent = Math.round(dataSize / 1024) + ' KB';
             }
             
-            document.getElementById('userMenuModal').style.display = 'flex';
+            document.getElementById('deviceModal').style.display = 'flex';
+        }
+        
+        function copyDeviceId() {
+            navigator.clipboard.writeText(state.deviceId)
+                .then(() => {
+                    showNotification('ID appareil copié!');
+                })
+                .catch(err => {
+                    console.error('Failed to copy: ', err);
+                });
         }
 
         // ==============================
-        // Cloud Sync Functions
+        // Cloud Sync Functions (No Authentication)
         // ==============================
         function syncData() {
-            if (!state.userData.uid) {
-                showNotification('Veuillez vous connecter pour synchroniser', 'warning');
+            if (!state.deviceId) {
+                showNotification('Erreur: ID appareil non trouvé', 'warning');
                 return;
             }
             
             showNotification('Synchronisation avec le cloud...', 'info');
             
-            // Prepare data for cloud (exclude sensitive info)
+            // Prepare data for cloud
             const cloudData = {
                 ...state,
-                userData: {
-                    uid: state.userData.uid,
-                    email: state.userData.email,
-                    displayName: state.userData.displayName
-                },
-                syncedAt: new Date().toISOString()
+                deviceId: state.deviceId,
+                syncedAt: new Date().toISOString(),
+                appVersion: '2.0.0'
             };
             
             // Remove timer interval for cloud storage
             delete cloudData.timer.interval;
             
-            // Save to Firebase Realtime Database
-            database.ref('users/' + state.userData.uid).set(cloudData)
+            // Save to Firebase Realtime Database under devices/{deviceId}
+            database.ref('devices/' + state.deviceId).set(cloudData)
                 .then(() => {
                     state.lastSync = new Date().toISOString();
                     saveToLocalStorage();
@@ -1631,8 +1450,8 @@
         }
         
         function loadCloudData() {
-            if (!state.userData.uid) {
-                showNotification('Veuillez vous connecter pour charger les données', 'warning');
+            if (!state.deviceId) {
+                showNotification('Erreur: ID appareil non trouvé', 'warning');
                 return;
             }
             
@@ -1642,7 +1461,7 @@
             
             showNotification('Chargement depuis le cloud...', 'info');
             
-            database.ref('users/' + state.userData.uid).once('value')
+            database.ref('devices/' + state.deviceId).once('value')
                 .then((snapshot) => {
                     const cloudData = snapshot.val();
                     if (cloudData) {
@@ -1658,14 +1477,8 @@
                                 interval: null,
                                 running: localTimer.running, // Keep local running state
                                 startTime: localTimer.running ? localTimer.startTime : null
-                            }
-                        };
-                        
-                        // Restore user data
-                        state.userData = {
-                            uid: state.userData.uid,
-                            email: state.userData.email,
-                            displayName: state.userData.displayName
+                            },
+                            deviceId: state.deviceId // Keep current device ID
                         };
                         
                         // Update UI
@@ -1685,7 +1498,7 @@
                         
                         showNotification('Données chargées depuis le cloud!');
                     } else {
-                        showNotification('Aucune donnée trouvée dans le cloud', 'info');
+                        showNotification('Aucune donnée trouvée dans le cloud pour cet appareil', 'info');
                     }
                 })
                 .catch((error) => {
@@ -1698,7 +1511,8 @@
             const pendingSync = JSON.parse(localStorage.getItem('pendingSync') || '[]');
             pendingSync.push({
                 data: data,
-                timestamp: new Date().toISOString()
+                timestamp: new Date().toISOString(),
+                deviceId: state.deviceId
             });
             localStorage.setItem('pendingSync', JSON.stringify(pendingSync));
             showNotification('Données sauvegardées pour synchronisation ultérieure', 'info');
@@ -1706,19 +1520,29 @@
         
         function retryPendingSync() {
             const pendingSync = JSON.parse(localStorage.getItem('pendingSync') || '[]');
-            if (pendingSync.length > 0 && navigator.onLine && state.userData.uid) {
+            if (pendingSync.length > 0 && navigator.onLine && state.deviceId) {
                 showNotification('Tentative de synchronisation des données en attente...', 'info');
                 
-                pendingSync.forEach((item, index) => {
-                    database.ref('users/' + state.userData.uid).set(item.data)
+                // Try to sync all pending data
+                const promises = pendingSync.map((item, index) => {
+                    return database.ref('devices/' + state.deviceId).set(item.data)
                         .then(() => {
                             // Remove successfully synced item
                             pendingSync.splice(index, 1);
-                            localStorage.setItem('pendingSync', JSON.stringify(pendingSync));
+                            return true;
                         })
                         .catch((error) => {
                             console.error('Pending sync error:', error);
+                            return false;
                         });
+                });
+                
+                // Update localStorage after all attempts
+                Promise.all(promises).then(() => {
+                    localStorage.setItem('pendingSync', JSON.stringify(pendingSync));
+                    if (pendingSync.length === 0) {
+                        showNotification('Toutes les données en attente ont été synchronisées');
+                    }
                 });
             }
         }
@@ -1818,23 +1642,20 @@
         // ==============================
         // Screen Management
         // ==============================
-        function showLoginScreen() {
-            document.getElementById('loginScreen').classList.add('active');
-            document.getElementById('appContent').style.display = 'none';
-        }
-        
-        function showAppContent() {
-            document.getElementById('loginScreen').classList.remove('active');
-            document.getElementById('appContent').style.display = 'block';
+        function showMainApp() {
+            document.getElementById('dredgeSelection').classList.remove('active');
             document.getElementById('operationsScreen').classList.add('active');
+            
+            // Update active tab
+            document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelector('.nav-tab:nth-child(1)').classList.add('active');
+            
+            saveToLocalStorage();
         }
 
         // ==============================
-        // Existing Application Functions
-        // (Keep all your existing functions as they were)
-        // ==============================
-        
         // Dredge Selection
+        // ==============================
         function selectDredge(dredgeType) {
             state.selectedDredge = dredgeType;
             state.currentDredge = dredgeType === 'blue-shark' ? 'Blue Shark' : 'White Shark';
@@ -1850,16 +1671,9 @@
             // Load motors for selected dredge
             loadMotors();
             
-            // Switch to operations screen
-            document.getElementById('dredgeSelection').classList.remove('active');
-            document.getElementById('operationsScreen').classList.add('active');
-            
-            // Update active tab
-            document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
-            document.querySelector('.nav-tab:nth-child(1)').classList.add('active');
-            
+            // Show main app
+            showMainApp();
             showNotification(`Drague ${state.currentDredge} sélectionnée`);
-            saveToLocalStorage();
         }
 
         function showSwitchDredgeModal() {
@@ -1879,7 +1693,9 @@
             saveToLocalStorage();
         }
 
+        // ==============================
         // Timer Functions
+        // ==============================
         function startTimer() {
             if (!state.timer.running) {
                 state.timer.running = true;
@@ -1963,7 +1779,9 @@
             }
         }
 
+        // ==============================
         // Operations Functions
+        // ==============================
         function saveOperation() {
             const length = parseFloat(document.getElementById('length').value) || 0;
             const width = parseFloat(document.getElementById('width').value) || 0;
@@ -2018,14 +1836,16 @@
             saveToLocalStorage();
             
             // Auto-sync if online
-            if (navigator.onLine && state.userData.uid) {
+            if (navigator.onLine && state.deviceId) {
                 syncData();
             }
             
             showNotification('Opération enregistrée avec succès');
         }
 
+        // ==============================
         // Reset Data Functions
+        // ==============================
         function resetAllData() {
             document.getElementById('resetModalTitle').textContent = 'Réinitialiser toutes les données';
             document.getElementById('resetModalText').textContent = 
@@ -2097,7 +1917,9 @@
             showNotification('Toutes les données ont été réinitialisées');
         }
 
+        // ==============================
         // Motors Functions
+        // ==============================
         function loadMotors() {
             const container = document.getElementById('motorsContainer');
             const motors = state.motors[state.selectedDredge];
@@ -2203,7 +2025,9 @@
             saveToLocalStorage();
         }
 
+        // ==============================
         // Fuel Functions
+        // ==============================
         function updateFuelDisplay() {
             const percentage = Math.round((state.fuel.current / state.fuel.capacity) * 100);
             
@@ -2271,7 +2095,9 @@
             container.innerHTML = html;
         }
 
+        // ==============================
         // Reports Functions
+        // ==============================
         function loadReports() {
             const container = document.getElementById('reportsList');
             
@@ -2342,7 +2168,9 @@
             showNotification('PDF généré avec succès (simulation)');
         }
 
+        // ==============================
         // Dashboard Functions
+        // ==============================
         function updateDashboard() {
             document.getElementById('totalHours').textContent = 
                 `${Math.floor(state.dailyData.hours)}h${Math.round((state.dailyData.hours % 1) * 60).toString().padStart(2, '0')}`;
@@ -2359,7 +2187,9 @@
                 `${efficiency} L/m³`;
         }
 
+        // ==============================
         // Navigation
+        // ==============================
         function showTab(tabName) {
             // Update active tab
             document.querySelectorAll('.nav-tab').forEach(tab => {
@@ -2385,12 +2215,16 @@
             }
         }
 
+        // ==============================
         // Modal Functions
+        // ==============================
         function closeModal(modalId) {
             document.getElementById(modalId).style.display = 'none';
         }
 
+        // ==============================
         // Notification System
+        // ==============================
         function showNotification(message, type = 'success') {
             const notification = document.getElementById('notification');
             const text = document.getElementById('notificationText');
@@ -2427,7 +2261,9 @@
             }, 3000);
         }
 
+        // ==============================
         // Local Storage Management
+        // ==============================
         function saveToLocalStorage() {
             // Save timer state too (so it continues after refresh)
             const saveState = {
