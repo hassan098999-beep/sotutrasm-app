@@ -6,104 +6,107 @@
     <meta name="theme-color" content="#0f172a">
     <title>SOTUTRASM - Smart Manager V8.0</title>
     
-    <link rel="manifest" href="manifest.json">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
     
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap');
         body { font-family: 'Poppins', sans-serif; background-color: #0f172a; color: #e2e8f0; }
-        .glass-panel { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(51, 65, 85, 0.5); }
+        .glass-panel { background: rgba(30, 41, 59, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(51, 65, 85, 0.5); }
+        .smart-input { width: 100%; padding: 12px; border-radius: 10px; border: 2px solid #334155; background: #1e293b; color: white; outline: none; }
+        .smart-input:focus { border-color: #3b82f6; }
         
-        /* Logo SOTUTRASM (Design Original) */
-        .logo-container { position: relative; width: 60px; height: 60px; margin: 0 auto; }
-        .logo-shape-t-top { position: absolute; top: 8px; left: 4px; right: 8px; height: 15px; background: linear-gradient(to right, #dc2626, #b91c1c); transform: skewX(-10deg); border-radius: 2px; }
-        .logo-shape-t-stem { position: absolute; top: 12px; left: 26px; width: 15px; height: 40px; background: linear-gradient(to bottom, #1d4ed8, #1e40af); transform: skewX(-10deg); border-radius: 2px; }
+        /* Logo Design */
+        .logo-container { position: relative; width: 80px; height: 80px; margin: 0 auto; }
+        .logo-shape-t-top { position: absolute; top: 10px; left: 5px; right: 10px; height: 20px; background: linear-gradient(to right, #dc2626, #b91c1c); transform: skewX(-10deg); border-radius: 2px; }
+        .logo-shape-t-stem { position: absolute; top: 15px; left: 35px; width: 20px; height: 50px; background: linear-gradient(to bottom, #1d4ed8, #1e40af); transform: skewX(-10deg); border-radius: 2px; }
     </style>
 </head>
 <body class="min-h-screen">
 
-    <nav class="glass-panel sticky top-0 z-50 px-4 py-3 flex justify-between items-center">
-        <div class="flex items-center gap-3">
-            <div class="logo-container scale-75">
-                <div class="logo-shape-t-top"></div>
-                <div class="logo-shape-t-stem"></div>
+    <div id="view-login" class="min-h-screen flex flex-col items-center justify-center p-6 bg-slate-900">
+        <div class="glass-panel rounded-3xl p-8 w-full max-w-md shadow-2xl">
+            <div class="text-center mb-8">
+                <div class="logo-container mb-4">
+                    <div class="logo-shape-t-top"></div>
+                    <div class="logo-shape-t-stem"></div>
+                </div>
+                <h1 class="text-3xl font-black text-white tracking-tight">SOTUTRASM</h1>
+                <p class="text-blue-400 font-bold text-xs uppercase tracking-widest mt-2">Smart Manager V8.0</p>
             </div>
-            <span class="font-black text-xl tracking-tighter">SOTUTRASM</span>
-        </div>
-        <button class="bg-slate-700 p-2 rounded-lg"><i class="fas fa-bars"></i></button>
-    </nav>
 
-    <main class="p-4 space-y-6">
-        
-        <div class="grid grid-cols-2 gap-4">
+            <div class="space-y-4">
+                <div>
+                    <label class="text-sm font-bold text-slate-400 mb-2 block">Email Address</label>
+                    <input type="email" id="login-email" class="smart-input" value="admin@sotutrasm.com">
+                </div>
+                <div>
+                    <label class="text-sm font-bold text-slate-400 mb-2 block">Password</label>
+                    <input type="password" id="login-password" class="smart-input" value="admin123">
+                </div>
+                <button onclick="handleLogin()" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-xl font-bold transition shadow-lg flex items-center justify-center gap-2">
+                    <i class="fas fa-sign-in-alt"></i> Se Connecter
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="view-main" class="hidden min-h-screen p-4">
+        <nav class="glass-panel sticky top-0 z-50 p-4 rounded-2xl flex justify-between items-center mb-6">
+            <div class="flex items-center gap-3">
+                <div class="logo-container scale-50 -ml-4">
+                    <div class="logo-shape-t-top"></div>
+                    <div class="logo-shape-t-stem"></div>
+                </div>
+                <h2 class="font-bold text-lg">Dashboard</h2>
+            </div>
+            <button onclick="handleLogout()" class="text-red-400 font-bold text-sm">Déconnexion</button>
+        </nav>
+
+        <div class="grid grid-cols-2 gap-4 mb-6">
             <div class="glass-panel p-4 rounded-2xl border-l-4 border-blue-500">
-                <p class="text-slate-400 text-xs uppercase font-bold">Flotte</p>
-                <h2 class="text-2xl font-black">24</h2>
-                <p class="text-blue-400 text-[10px] mt-1"><i class="fas fa-check-circle"></i> En service</p>
+                <p class="text-slate-400 text-xs font-bold uppercase">Volume Total</p>
+                <h3 class="text-2xl font-black">1,250 <small class="text-xs">m³</small></h3>
             </div>
-            <div class="glass-panel p-4 rounded-2xl border-l-4 border-red-500">
-                <p class="text-slate-400 text-xs uppercase font-bold">Panne</p>
-                <h2 class="text-2xl font-black text-red-400">03</h2>
-                <p class="text-slate-500 text-[10px] mt-1"><i class="fas fa-tools"></i> En atelier</p>
+            <div class="glass-panel p-4 rounded-2xl border-l-4 border-emerald-500">
+                <p class="text-slate-400 text-xs font-bold uppercase">Carburant</p>
+                <h3 class="text-2xl font-black">450 <small class="text-xs">L</small></h3>
             </div>
         </div>
 
-        <div class="glass-panel rounded-2xl overflow-hidden">
-            <div class="p-4 bg-slate-800/50 flex justify-between items-center">
-                <h3 class="font-bold text-sm">Activité Récente</h3>
-                <button class="text-blue-400 text-xs">Voir tout</button>
-            </div>
-            <div class="overflow-x-auto">
-                <table class="w-full text-left text-xs">
-                    <thead class="bg-slate-900/50 text-slate-400 uppercase">
-                        <tr>
-                            <th class="p-3">Véhicule</th>
-                            <th class="p-3">Statut</th>
-                            <th class="p-3">Conducteur</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-700">
-                        <tr>
-                            <td class="p-3 font-bold">Bus #102</td>
-                            <td class="p-3"><span class="bg-green-500/10 text-green-400 px-2 py-0.5 rounded">Actif</span></td>
-                            <td class="p-3 text-slate-400">Ahmed H.</td>
-                        </tr>
-                        <tr>
-                            <td class="p-3 font-bold">Grue #05</td>
-                            <td class="p-3"><span class="bg-yellow-500/10 text-yellow-400 px-2 py-0.5 rounded">Repos</span></td>
-                            <td class="p-3 text-slate-400">Sami K.</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 gap-3">
-            <button class="w-full bg-blue-600 hover:bg-blue-700 p-4 rounded-xl font-bold flex items-center justify-center gap-3 transition-all">
-                <i class="fas fa-file-signature"></i>
-                Nouveau Rapport Quotidien
-            </button>
-            <button class="w-full glass-panel p-4 rounded-xl font-bold flex items-center justify-center gap-3">
-                <i class="fas fa-gas-pump text-orange-400"></i>
-                Saisie Carburant
-            </button>
-        </div>
-
-    </main>
-
-    <div class="fixed bottom-0 left-0 right-0 glass-panel border-t border-slate-700 px-6 py-3 flex justify-between items-center text-slate-400">
-        <div class="flex flex-col items-center text-blue-400"><i class="fas fa-home"></i><span class="text-[10px] mt-1">Dashboard</span></div>
-        <div class="flex flex-col items-center"><i class="fas fa-bus"></i><span class="text-[10px] mt-1">Flotte</span></div>
-        <div class="flex flex-col items-center"><i class="fas fa-chart-pie"></i><span class="text-[10px] mt-1">Stats</span></div>
-        <div class="flex flex-col items-center"><i class="fas fa-cog"></i><span class="text-[10px] mt-1">Paramètres</span></div>
+        <button onclick="alert('Fonctionnalité de rapport bientôt disponible')" class="w-full bg-blue-600 p-4 rounded-xl font-bold mb-4 shadow-lg">
+            <i class="fas fa-plus-circle"></i> Nouveau Rapport
+        </button>
     </div>
 
     <script>
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('service-worker.js');
+        // الأوامر البرمجية التي تجعل الأزرار تعمل
+        function handleLogin() {
+            const email = document.getElementById('login-email').value;
+            const pass = document.getElementById('login-password').value;
+
+            if(email === "admin@sotutrasm.com" && pass === "admin123") {
+                document.getElementById('view-login').classList.add('hidden');
+                document.getElementById('view-main').classList.remove('hidden');
+                localStorage.setItem('logged_in', 'true');
+            } else {
+                alert("Erreur: Identifiants invalides");
+            }
         }
+
+        function handleLogout() {
+            document.getElementById('view-main').classList.add('hidden');
+            document.getElementById('view-login').classList.remove('hidden');
+            localStorage.removeItem('logged_in');
+        }
+
+        // فحص حالة الدخول عند فتح الصفحة
+        window.onload = function() {
+            if(localStorage.getItem('logged_in') === 'true') {
+                document.getElementById('view-login').classList.add('hidden');
+                document.getElementById('view-main').classList.remove('hidden');
+            }
+        };
     </script>
 </body>
 </html>
