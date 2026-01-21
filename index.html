@@ -4,109 +4,122 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#0f172a">
-    <title>SOTUTRASM - Smart Manager V8.0</title>
+    <title>SOTUTRASM Cloud V8.0</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
         body { font-family: 'Poppins', sans-serif; background-color: #0f172a; color: #e2e8f0; }
         .glass-panel { background: rgba(30, 41, 59, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(51, 65, 85, 0.5); }
-        .smart-input { width: 100%; padding: 12px; border-radius: 10px; border: 2px solid #334155; background: #1e293b; color: white; outline: none; }
-        .smart-input:focus { border-color: #3b82f6; }
-        
-        /* Logo Design */
-        .logo-container { position: relative; width: 80px; height: 80px; margin: 0 auto; }
-        .logo-shape-t-top { position: absolute; top: 10px; left: 5px; right: 10px; height: 20px; background: linear-gradient(to right, #dc2626, #b91c1c); transform: skewX(-10deg); border-radius: 2px; }
-        .logo-shape-t-stem { position: absolute; top: 15px; left: 35px; width: 20px; height: 50px; background: linear-gradient(to bottom, #1d4ed8, #1e40af); transform: skewX(-10deg); border-radius: 2px; }
+        .input-field { width: 100%; padding: 12px; border-radius: 10px; background: #1e293b; border: 1px solid #334155; color: white; margin-bottom: 15px; }
     </style>
 </head>
 <body class="min-h-screen">
 
-    <div id="view-login" class="min-h-screen flex flex-col items-center justify-center p-6 bg-slate-900">
+    <div id="view-login" class="min-h-screen flex flex-col items-center justify-center p-6">
         <div class="glass-panel rounded-3xl p-8 w-full max-w-md shadow-2xl">
-            <div class="text-center mb-8">
-                <div class="logo-container mb-4">
-                    <div class="logo-shape-t-top"></div>
-                    <div class="logo-shape-t-stem"></div>
-                </div>
-                <h1 class="text-3xl font-black text-white tracking-tight">SOTUTRASM</h1>
-                <p class="text-blue-400 font-bold text-xs uppercase tracking-widest mt-2">Smart Manager V8.0</p>
-            </div>
-
-            <div class="space-y-4">
-                <div>
-                    <label class="text-sm font-bold text-slate-400 mb-2 block">Email Address</label>
-                    <input type="email" id="login-email" class="smart-input" value="admin@sotutrasm.com">
-                </div>
-                <div>
-                    <label class="text-sm font-bold text-slate-400 mb-2 block">Password</label>
-                    <input type="password" id="login-password" class="smart-input" value="admin123">
-                </div>
-                <button onclick="handleLogin()" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-xl font-bold transition shadow-lg flex items-center justify-center gap-2">
-                    <i class="fas fa-sign-in-alt"></i> Se Connecter
-                </button>
-            </div>
+            <h1 class="text-3xl font-black text-white text-center mb-6">SOTUTRASM</h1>
+            <p class="text-blue-400 text-center text-sm mb-8 uppercase font-bold">Connexion Cloud</p>
+            
+            <input type="email" id="email" class="input-field" placeholder="Email" value="admin@sotutrasm.com">
+            <input type="password" id="pass" class="input-field" placeholder="Mot de passe" value="admin123">
+            <button onclick="login()" class="w-full bg-blue-600 py-4 rounded-xl font-bold shadow-lg hover:bg-blue-700 transition">Se Connecter</button>
         </div>
     </div>
 
-    <div id="view-main" class="hidden min-h-screen p-4">
-        <nav class="glass-panel sticky top-0 z-50 p-4 rounded-2xl flex justify-between items-center mb-6">
-            <div class="flex items-center gap-3">
-                <div class="logo-container scale-50 -ml-4">
-                    <div class="logo-shape-t-top"></div>
-                    <div class="logo-shape-t-stem"></div>
-                </div>
-                <h2 class="font-bold text-lg">Dashboard</h2>
-            </div>
-            <button onclick="handleLogout()" class="text-red-400 font-bold text-sm">Déconnexion</button>
+    <div id="view-main" class="hidden p-4 space-y-6">
+        <nav class="flex justify-between items-center bg-slate-800 p-4 rounded-2xl">
+            <span class="font-bold text-blue-400">SOTUTRASM Manager</span>
+            <button onclick="location.reload()" class="text-red-400 text-xs uppercase font-bold">Déconnexion</button>
         </nav>
 
-        <div class="grid grid-cols-2 gap-4 mb-6">
-            <div class="glass-panel p-4 rounded-2xl border-l-4 border-blue-500">
-                <p class="text-slate-400 text-xs font-bold uppercase">Volume Total</p>
-                <h3 class="text-2xl font-black">1,250 <small class="text-xs">m³</small></h3>
-            </div>
-            <div class="glass-panel p-4 rounded-2xl border-l-4 border-emerald-500">
-                <p class="text-slate-400 text-xs font-bold uppercase">Carburant</p>
-                <h3 class="text-2xl font-black">450 <small class="text-xs">L</small></h3>
-            </div>
+        <div class="glass-panel p-6 rounded-2xl">
+            <h3 class="font-bold mb-4"><i class="fas fa-cloud-upload-alt mr-2"></i> Nouveau Rapport</h3>
+            <label class="text-xs text-slate-400">Volume de production (m³)</label>
+            <input type="number" id="volume" class="input-field mt-2" placeholder="Ex: 120">
+            <button onclick="syncToFirebase()" id="btn-sync" class="w-full bg-emerald-600 py-4 rounded-xl font-bold shadow-lg hover:bg-emerald-700 transition">
+                Synchroniser avec le Cloud
+            </button>
         </div>
 
-        <button onclick="alert('Fonctionnalité de rapport bientôt disponible')" class="w-full bg-blue-600 p-4 rounded-xl font-bold mb-4 shadow-lg">
-            <i class="fas fa-plus-circle"></i> Nouveau Rapport
-        </button>
+        <div class="glass-panel p-4 rounded-2xl">
+            <h3 class="font-bold mb-4 text-sm uppercase text-slate-400">Données Synchronisées</h3>
+            <div id="data-list" class="space-y-2 text-sm text-slate-300">
+                Chargement des données...
+            </div>
+        </div>
     </div>
 
     <script>
-        // الأوامر البرمجية التي تجعل الأزرار تعمل
-        function handleLogin() {
-            const email = document.getElementById('login-email').value;
-            const pass = document.getElementById('login-password').value;
-
-            if(email === "admin@sotutrasm.com" && pass === "admin123") {
-                document.getElementById('view-login').classList.add('hidden');
-                document.getElementById('view-main').classList.remove('hidden');
-                localStorage.setItem('logged_in', 'true');
-            } else {
-                alert("Erreur: Identifiants invalides");
-            }
-        }
-
-        function handleLogout() {
-            document.getElementById('view-main').classList.add('hidden');
-            document.getElementById('view-login').classList.remove('hidden');
-            localStorage.removeItem('logged_in');
-        }
-
-        // فحص حالة الدخول عند فتح الصفحة
-        window.onload = function() {
-            if(localStorage.getItem('logged_in') === 'true') {
-                document.getElementById('view-login').classList.add('hidden');
-                document.getElementById('view-main').classList.remove('hidden');
-            }
+        // إعداداتك التي أرسلتها
+        const firebaseConfig = {
+            apiKey: "AIzaSyBJxyFwFseINtXqdEU0JYESl6zQYVj0hSw",
+            authDomain: "sotutrasm-manager.firebaseapp.com",
+            projectId: "sotutrasm-manager",
+            storageBucket: "sotutrasm-manager.firebasestorage.app",
+            messagingSenderId: "452756329466",
+            appId: "1:452756329466:web:8c5b54a2818e4602874a43",
+            measurementId: "G-GGQC6EDSZB"
         };
+
+        // تفعيل Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        function login() {
+            document.getElementById('view-login').classList.add('hidden');
+            document.getElementById('view-main').classList.remove('hidden');
+            loadData(); // جلب البيانات عند الدخول
+        }
+
+        // إرسال البيانات للسحابة
+        function syncToFirebase() {
+            const vol = document.getElementById('volume').value;
+            const btn = document.getElementById('btn-sync');
+            
+            if(!vol) return alert("Veuillez entrer une valeur");
+
+            btn.disabled = true;
+            btn.innerHTML = "En cours...";
+
+            db.collection("reports").add({
+                volume: vol,
+                date: new Date().toLocaleString('fr-FR'),
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            })
+            .then(() => {
+                alert("Données sauvegardées sur le Cloud !");
+                document.getElementById('volume').value = "";
+                btn.disabled = false;
+                btn.innerHTML = "Synchroniser avec le Cloud";
+            })
+            .catch(err => {
+                alert("Erreur: " + err.message);
+                btn.disabled = false;
+            });
+        }
+
+        // جلب البيانات من السحابة وعرضها
+        function loadData() {
+            db.collection("reports").orderBy("timestamp", "desc").onSnapshot((snapshot) => {
+                const list = document.getElementById('data-list');
+                list.innerHTML = "";
+                snapshot.forEach((doc) => {
+                    const data = doc.data();
+                    list.innerHTML += `
+                        <div class="bg-slate-900/50 p-3 rounded-lg border border-slate-700 flex justify-between items-center">
+                            <span><strong class="text-emerald-400">${data.volume}</strong> m³</span>
+                            <span class="text-[10px] text-slate-500">${data.date}</span>
+                        </div>
+                    `;
+                });
+            });
+        }
     </script>
 </body>
 </html>
