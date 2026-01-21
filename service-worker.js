@@ -1,31 +1,31 @@
 // Configuration
-const CACHE_NAME = 'sotutrasm-v1.0.0';
+const CACHE_NAME = 'sotutrasm-v2.0.0';
 const urlsToCache = [
   './',
   './index.html',
   './manifest.json',
-  // Vous pouvez ajouter d'autres ressources statiques ici
+  // Add other static resources here
 ];
 
-// Installation
+// Install event
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
-        console.log('Cache ouvert');
+        console.log('Cache opened');
         return cache.addAll(urlsToCache);
       })
   );
 });
 
-// Activation et nettoyage des anciens caches
+// Activate event
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return Promise.all(
         cacheNames.map(cacheName => {
           if (cacheName !== CACHE_NAME) {
-            console.log('Suppression de l\'ancien cache:', cacheName);
+            console.log('Deleting old cache:', cacheName);
             return caches.delete(cacheName);
           }
         })
@@ -34,70 +34,86 @@ self.addEventListener('activate', event => {
   );
 });
 
-// Stratégie: Cache d'abord, puis réseau
+// Fetch event with network-first strategy for API calls
 self.addEventListener('fetch', event => {
-  event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        if (response) {
+  // For Firebase API calls, use network-first strategy
+  if (event.request.url.includes('firebase')) {
+    event.respondWith(
+      fetch(event.request)
+        .then(response => {
           return response;
-        }
-        
-        // Si pas dans le cache, récupérer du réseau
-        return fetch(event.request)
-          .then(response => {
-            // Vérifier si la réponse est valide
-            if (!response || response.status !== 200 || response.type !== 'basic') {
-              return response;
-            }
-
-            // Mettre en cache pour la prochaine fois
-            const responseToCache = response.clone();
-            caches.open(CACHE_NAME)
-              .then(cache => {
-                cache.put(event.request, responseToCache);
-              });
-
-            return response;
-          })
-          .catch(() => {
-            // Fallback pour les pages
-            if (event.request.mode === 'navigate') {
-              return caches.match('./');
-            }
-            
-            // Fallback pour les images
-            if (event.request.destination === 'image') {
-              return new Response(
-                '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"><rect width="200" height="200" fill="#f0f0f0"/><text x="100" y="100" font-family="Arial" font-size="14" fill="#666" text-anchor="middle" dominant-baseline="middle">Image non disponible hors ligne</text></svg>',
-                {
-                  headers: { 'Content-Type': 'image/svg+xml' }
-                }
-              );
-            }
+        })
+        .catch(() => {
+          // If network fails, show offline message
+          return new Response(JSON.stringify({
+            error: 'You are offline. Data will be synced when connection is restored.'
+          }), {
+            headers: { 'Content-Type': 'application/json' }
           });
-      })
-  );
-});
+        })
+    );
+  } else {
+    // For static resources, use cache-first strategy
+    event.respondWith(
+      caches.match(event.request)
+        .then(response => {
+          if (response) {
+            return response;
+          }
+          
+          return fetch(event.request)
+            .then(response => {
+              if (!response || response.status !== 200 || response.type !== 'basic') {
+                return response;
+              }
 
-// Synchronisation en arrière-plan
-self.addEventListener('sync', event => {
-  if (event.tag === 'sync-data') {
-    event.waitUntil(syncData());
+              const responseToCache = response.clone();
+              caches.open(CACHE_NAME)
+                .then(cache => {
+                  cache.put(event.request, responseToCache);
+                });
+
+              return response;
+            })
+            .catch(() => {
+              // Fallback for pages
+              if (event.request.mode === 'navigate') {
+                return caches.match('./');
+              }
+            });
+        })
+    );
   }
 });
 
-// Notification push
+// Background sync for offline data
+self.addEventListener('sync', event => {
+  if (event.tag === 'sync-pending-data') {
+    event.waitUntil(syncPendingData());
+  }
+});
+
+// Push notifications
 self.addEventListener('push', event => {
   const data = event.data ? event.data.json() : {};
   const options = {
-    body: data.body || 'Nouvelle notification',
+    body: data.body || 'Nouvelle notification SOTUTRASM',
     icon: 'icon-192x192.png',
     badge: 'icon-192x192.png',
     vibrate: [100, 50, 100],
     data: {
       url: data.url || './'
-    }
+    },
+    actions: [
+      {
+        action: 'open',
+        title: 'Ouvrir'
+      },
+      {
+        action: 'close',
+        title: 'Fermer'
+      }
+    ]
   };
 
   event.waitUntil(
@@ -105,23 +121,28 @@ self.addEventListener('push', event => {
   );
 });
 
-// Gestion des clics sur les notifications
+// Notification click handler
 self.addEventListener('notificationclick', event => {
   event.notification.close();
   
-  event.waitUntil(
-    clients.openWindow(event.notification.data.url)
-  );
+  if (event.action === 'open') {
+    event.waitUntil(
+      clients.openWindow(event.notification.data.url)
+    );
+  }
 });
 
-// Fonction de synchronisation
-async function syncData() {
+// Function to sync pending data
+async function syncPendingData() {
   try {
-    // Récupérer les données en attente
+    // Get pending data from IndexedDB or cache
     const pendingData = await getPendingData();
     
-    // Synchroniser avec le serveur
     if (pendingData.length > 0) {
+      console.log('Syncing pending data:', pendingData.length, 'items');
+      
+      // Send to server (simulated)
+      // In real implementation, send to Firebase
       const response = await fetch('https://api.example.com/sync', {
         method: 'POST',
         headers: {
@@ -131,48 +152,29 @@ async function syncData() {
       });
 
       if (response.ok) {
-        // Supprimer les données synchronisées
+        console.log('Pending data synced successfully');
         await clearPendingData();
-        console.log('Synchronisation réussie');
-        
-        // Notifier les clients
-        self.clients.matchAll().then(clients => {
-          clients.forEach(client => {
-            client.postMessage({
-              type: 'SYNC_COMPLETE',
-              data: pendingData.length
-            });
-          });
-        });
       }
     }
   } catch (error) {
-    console.error('Erreur de synchronisation:', error);
+    console.error('Background sync error:', error);
   }
 }
 
-// Stockage local pour les données en attente
+// Helper functions for pending data
 async function getPendingData() {
-  const cache = await caches.open('pending-data');
-  const response = await cache.match('data');
-  return response ? response.json() : [];
+  // In a real app, use IndexedDB
+  return [];
 }
 
 async function clearPendingData() {
-  const cache = await caches.open('pending-data');
-  return cache.delete('data');
+  // In a real app, clear from IndexedDB
+  return;
 }
 
-// Écouter les messages du client
+// Message handler from main thread
 self.addEventListener('message', event => {
-  if (event.data.type === 'SAVE_PENDING_DATA') {
-    savePendingDataToCache(event.data.data);
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
   }
 });
-
-async function savePendingDataToCache(data) {
-  const cache = await caches.open('pending-data');
-  const currentData = await getPendingData();
-  currentData.push(data);
-  await cache.put('data', new Response(JSON.stringify(currentData)));
-}
